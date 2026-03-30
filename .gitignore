@@ -1,0 +1,36 @@
+# R environment files
+.Rhistory
+.RData
+.Rproj.user
+
+# R data files
+*.RData
+*.rda
+
+# CSV data files
+*.csv
+
+# Tab delimited text files
+*.txt
+
+# Excel files
+*.xls
+*.xlsx
+
+# PDF figures
+*.pdf
+
+# Image files
+*.png
+
+# BRFSS folders
+BRFSS_2001_Gun_Ownership/
+BRFSS_2002_Gun_Ownership/
+BRFSS_2004_Gun_Ownership/
+
+#Zip files
+*.zip
+*.ZIP
+
+# Unused/legacy scripts
+working_gun.R
