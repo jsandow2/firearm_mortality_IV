@@ -17,9 +17,6 @@
 *.xls
 *.xlsx
 
-# PDF figures
-*.pdf
-
 # Image files
 *.png
 
@@ -34,3 +31,4 @@ BRFSS_2004_Gun_Ownership/
 
 # Unused/legacy scripts
 working_gun.R
+.positai
