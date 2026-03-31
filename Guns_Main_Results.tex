@@ -1,0 +1,52 @@
+\begin{table}[!htbp] \centering 
+  \caption{IV Estimates of the Effect of Household Firearm Ownership on 
+                    Firearm Mortality} 
+  \label{tab:main_results}
+\begin{threeparttable}
+\begin{tabular}{@{\extracolsep{5pt}}lccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{3}{c}{Firearm Death Rate} \\ 
+ & Pooled IV & Two-Way FE & State FE + Decision \\ 
+\\[-1.8ex] & (1) & (2) & (3)\\ 
+\hline \\[-1.8ex] 
+ HFR & $-$0.005 & 0.007$^{*}$ & 0.003$^{**}$ \\ 
+  & (0.006) & (0.004) & (0.002) \\ 
+  & & & \\ 
+ universl & $-$0.0002 & 0.0001 & 0.00004 \\ 
+  & (0.0004) & (0.0001) & (0.00003) \\ 
+  & & & \\ 
+ permit & $-$0.001 & 0.0002 & 0.0001 \\ 
+  & (0.001) & (0.0002) & (0.0001) \\ 
+  & & & \\ 
+ decision &  &  & 0.00002$^{**}$ \\ 
+  &  &  & (0.00001) \\ 
+  & & & \\ 
+\hline \\[-1.8ex] 
+State FE & No & Yes & Yes \\ 
+Year FE & No & Yes & No \\ 
+SE Clustering & State & State & State \\
+First-Stage F & 60.09 & 16.08 & 38.28 \\ 
+Wu-Hausman p-value & $<0.001$ & $<0.001$ & $<0.001$ \\ 
+Sargan & Exactly ID & Exactly ID & Exactly ID \\ 
+Observations & 19,922 & 19,922 & 19,922 \\ 
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item \textit{Notes:} All specifications instrument household firearm 
+ownership rates ($HFR_{s,t}$) with the leave-one-out population-weighted 
+mean murder arrest rate of neighboring counties ($WAR_{i,t}$). Column (1) 
+is pooled IV with no fixed effects. Column (2) adds state and year fixed 
+effects. Column (3) replaces year fixed effects with $\mathbbm{1}\{decision_{i,t}\}$, 
+equal to one for observations after 2010. $\mathbbm{1}\{universal_{s,t}\}$ 
+and $\mathbbm{1}\{permit_{s,t}\}$ indicate states with universal background 
+check and concealed carry permit requirements, respectively. The Wu-Hausman test rejects the null of exogeneity in all specifications, confirming the endogeneity of $HFR_{s,t}$ and the necessity of the instrumental variable approach. The model is exactly identified, one instrument for one endogenous variable, and the Sargan overidentification test is therefore not applicable. First-stage F-statistics are reported without clustering; the Anderson-Rubin test is employed as a weak-instrument-robust check (see identification section). Standard errors 
+clustered at the state level in parentheses. 
+$^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
