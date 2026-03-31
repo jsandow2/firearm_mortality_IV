@@ -10,12 +10,12 @@
 
 ## Overview
 
-This repository contains the R code for a causal analysis of the effect 
-of household firearm ownership rates on total firearm mortality using a 
-county-level panel dataset spanning 1999--2016. The analysis employs a 
-leave-one-out instrumental variable strategy, using the population-weighted 
-mean murder arrest rate of neighboring counties as an instrument for 
-state-level household firearm ownership rates.
+This repository contains the R code and dissertation LaTeX files for a causal 
+analysis of the effect of household firearm ownership rates on total firearm 
+mortality using a county-level panel dataset spanning 1999--2016. The analysis 
+employs a leave-one-out instrumental variable strategy, using the 
+population-weighted mean murder arrest rate of neighboring counties as an 
+instrument for state-level household firearm ownership rates.
 
 ---
 
@@ -26,19 +26,34 @@ percentage point increase in the household firearm ownership rate causally
 increases the firearm death rate by approximately 0.065 additional deaths 
 per 100,000 population, an increase of roughly 0.85% relative to the 
 sample mean. Results are robust to weak-instrument concerns under 
-Anderson-Rubin inference.
+Anderson-Rubin inference (F = 56.68, p < 0.001).
 
 ---
 
 ## Repository Structure
+
+## Repository Structure
 ```
 firearm_mortality_IV/
-├── guns_county_CDC_formatted.R   # Main analysis script
-├── crime_adjacency.R             # County adjacency construction
-├── ReadCrimeData.R               # Crime data reading utilities
-├── firearm_mortality_IV.Rproj    # RStudio project file
-├── .gitignore                    # Git ignore rules
-└── README.md                     # This file
+├── guns_county_CDC_formatted.R           # Main analysis script
+├── crime_adjacency.R                     # County adjacency construction
+├── ReadCrimeData.R                       # Crime data reading utilities
+├── dissertation_template.tex             # UNL nuthesis dissertation template
+├── bibliography.bib                      # BibTeX bibliography
+├── aea.bst                               # AEA bibliography style file
+├── nuthesis.cls                          # UNL dissertation class file
+├── firearm_mortality_IV.Rproj            # RStudio project file
+├── .gitignore                            # Git ignore rules
+├── README.md                             # This file
+│
+├── Figures/
+│   ├── HFR.pdf                           # Household firearm ownership rate by year
+│   ├── mean_deaths_per_hund.pdf          # Mean firearm deaths per 100,000 by year
+│   ├── self_harm_v_other.pdf             # Self-harm vs other gun deaths
+│   ├── SH_gender.pdf                     # Self-harm by sex assigned at birth
+│   ├── idaho_mon_suicides_homicides.pdf  # Idaho and Montana suicide vs homicide
+│   ├── NEJM_reproduction.pdf             # Leading causes of death ages 1-19
+│   └── percent_covered.pdf              # Population coverage by year
 ```
 
 ---
@@ -80,6 +95,10 @@ prettyR, eventstudyr
 ### R Version
 Developed under R 4.x
 
+### LaTeX
+Requires the `nuthesis.cls` class file (included in repo) and a standard 
+LaTeX distribution. Compiled and maintained via Overleaf.
+
 ---
 
 ## Identification Strategy
@@ -91,6 +110,15 @@ WAR_it = Σ_{j≠i} p_jt × ar_jt
 
 where ar_jt is the murder arrest rate in county j at time t and p_jt is 
 the population weight of county j among all counties adjacent to i.
+
+---
+
+## Dissertation
+
+The LaTeX dissertation is maintained in Overleaf and synced to this 
+repository. The document uses the University of Nebraska-Lincoln `nuthesis` 
+class. To compile locally ensure `nuthesis.cls` and `aea.bst` are in the 
+same directory as `dissertation_template.tex`.
 
 ---
 
