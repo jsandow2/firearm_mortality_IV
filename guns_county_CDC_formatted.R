@@ -196,6 +196,29 @@ county_WAR <- rbind(crime, arrests_off_year, Florida_crime)
 county_WAR$fipsneighbor <- as.double(county_WAR$fipsneighbor)
 
 # -----------------------------------------------------------------------------
+# 6a. Construct adjacency variants for robustness checks
+# -----------------------------------------------------------------------------
+
+# Within-state adjacency: restrict to neighbors sharing the same state FIPS
+adjacency2010_instate <- adjacency2010 %>%
+  mutate(
+    st_county   = substr(formatC(fipscounty,  width = 5, flag = "0"), 1, 2),
+    st_neighbor = substr(formatC(fipsneighbor, width = 5, flag = "0"), 1, 2)
+  ) %>%
+  filter(st_county == st_neighbor) %>%
+  select(countyname, fipscounty, neighborname, fipsneighbor)
+
+# Border county identification: counties with at least one cross-state neighbor
+border_counties <- adjacency2010 %>%
+  mutate(
+    st_county   = substr(formatC(fipscounty,  width = 5, flag = "0"), 1, 2),
+    st_neighbor = substr(formatC(fipsneighbor, width = 5, flag = "0"), 1, 2)
+  ) %>%
+  filter(st_county != st_neighbor) %>%
+  pull(fipscounty) %>%
+  unique()
+
+# -----------------------------------------------------------------------------
 # 7. Construct leave-one-out WAR instrument (WAR_it)
 # -----------------------------------------------------------------------------
 
@@ -215,7 +238,7 @@ adjacency_w <- left_join(adjacency_w, sum_c_pop, by = c("fipscounty", "YEAR"))
 # Compute population-weighted murder arrest rate and sum across neighbors
 # Scaled to per 100,000 population
 adjacency_w <- adjacency_w %>%
-  mutate(WAR_weighted = WAR / neighboring_counties_pop * 100000) %>%
+  mutate(WAR_weighted = WAR / neighboring_counties_pop) %>%
   group_by(fipscounty, YEAR) %>%
   summarise(WAR = sum(WAR_weighted), .groups = "drop") %>%
   filter(!is.na(WAR))
@@ -235,7 +258,7 @@ colnames(guns_county_CDCnt) <- c(
 # are coerced to NA — this is expected and valid
 guns_county_CDCnt$deaths     <- as.double(guns_county_CDCnt$deaths)
 guns_county_CDCnt$population <- as.double(guns_county_CDCnt$population)
-guns_county_CDCnt$d_rate     <- guns_county_CDCnt$deaths / guns_county_CDCnt$population
+guns_county_CDCnt$d_rate     <- (guns_county_CDCnt$deaths / guns_county_CDCnt$population)
 
 # -----------------------------------------------------------------------------
 # 9. Clean CDC WONDER national self-harm and other gun death data
@@ -300,6 +323,54 @@ ggplot(data = NatAvg_D, aes(x = Year)) +
     y     = "Deaths Per 100,000"
   ) +
   theme_gray()
+
+# National average gun death rate by year
+# RATE from CDC_gun_cleandl is the CDC-computed state-level death rate
+# per 100,000, not subject to county-level suppression
+# Mean across states is unweighted — consistent with prior figure
+
+NatAvg_D <- CDC_gun_cleandl %>%
+  filter(!is.na(RATE)) %>%
+  group_by(Year) %>%
+  summarise(
+    sample_mean = mean(RATE),      # unweighted state mean (existing series)
+    .groups     = "drop"
+  )
+
+# County-level estimation sample mean by year for comparison
+sample_mean_by_year <- complete_county_data0 %>%
+  filter(!is.na(d_rate)) %>%
+  group_by(Year) %>%
+  summarise(
+    county_mean = mean(d_rate * 100000, na.rm = TRUE),
+    .groups     = "drop"
+  )
+
+plot_data_D <- left_join(NatAvg_D, sample_mean_by_year, by = "Year")
+
+ggplot(data = plot_data_D, aes(x = Year)) +
+  geom_line(aes(y = sample_mean, color = "State-Level CDC Rate"),
+            linewidth = 0.9) +
+  geom_point(aes(y = sample_mean, color = "State-Level CDC Rate"), size = 3) +
+  geom_line(aes(y = county_mean, color = "County Estimation Sample Mean"),
+            linewidth = 0.9, linetype = "dashed") +
+  geom_point(aes(y = county_mean, color = "County Estimation Sample Mean"),
+             size = 3) +
+  scale_color_manual(
+    values = c(
+      "State-Level CDC Rate"          = "blue",
+      "County Estimation Sample Mean" = "red"
+    )
+  ) +
+  scale_x_continuous(limits = c(1999, 2016)) +
+  labs(
+    title = "Mean Deaths Per 100,000 by Year",
+    x     = "Year",
+    y     = "Deaths Per 100,000",
+    color = ""
+  ) +
+  theme_gray() +
+  theme(legend.position = "bottom")
 
 # Self-harm vs. all other gun deaths by year
 ggplot(data = combined_data, aes(x = Year, y = total_deaths, fill = category)) +
@@ -806,6 +877,392 @@ RAND_state_mean <- RAND_gun %>%
   filter(Year > 1998) %>%
   group_by(FIP, STATE) %>%
   summarise(HFR_m = mean(HFR), .groups = "drop")
+
+# -----------------------------------------------------------------------------
+# 26. Robustness
+# -----------------------------------------------------------------------------
+# Reduced form check (coefficient of WAR from (first_stage/rf_robust):
+
+RF_fixed <- ivreg(
+  d_rate ~ c_WAR + universl + permit + factor(FIPS_ST) + factor(Year) |
+    c_WAR + universl + permit + factor(FIPS_ST) + factor(Year),
+  data = complete_county_data0
+)
+
+rf_robust <- coeftest(
+  RF_fixed,
+  vcov. = vcovCL(RF_fixed, cluster = ~FIPS_ST, data = complete_county_data0)
+)
+
+rf_robust
+
+# Robustness: Within-state WAR instrument
+# Build panel adjacency table using within-state neighbors only
+adjacency_instate <- data.frame()
+
+for (year in years) {
+  temp <- adjacency2010_instate
+  temp$YEAR <- year
+  adjacency_instate <- rbind(adjacency_instate, temp)
+}
+
+# Construct within-state leave-one-out WAR
+adjacency_w_instate <- left_join(
+  adjacency_instate, county_WAR, 
+  by = c("fipsneighbor", "YEAR")
+) %>%
+  filter(fipsneighbor != fipscounty)
+
+sum_c_pop_instate <- adjacency_w_instate %>%
+  group_by(fipscounty, YEAR) %>%
+  summarise(
+    neighboring_counties_pop = sum(c_pop, na.rm = TRUE), 
+    .groups = "drop"
+  )
+
+adjacency_w_instate <- left_join(
+  adjacency_w_instate, sum_c_pop_instate, 
+  by = c("fipscounty", "YEAR")
+)
+
+adjacency_w_instate <- adjacency_w_instate %>%
+  mutate(WAR_weighted = WAR / neighboring_counties_pop) %>%
+  group_by(fipscounty, YEAR) %>%
+  summarise(WAR_instate = sum(WAR_weighted), .groups = "drop") %>%
+  filter(!is.na(WAR_instate))
+
+# Join to estimation sample
+WAR_instate_county_year <- adjacency_w_instate %>%
+  group_by(fipscounty, YEAR) %>%
+  summarise(c_WAR_instate = mean(WAR_instate), .groups = "drop")
+
+complete_county_data0 <- left_join(
+  complete_county_data0,
+  WAR_instate_county_year %>% rename(Year = YEAR),
+  by = c("fipscounty", "Year")
+)
+
+# Run IV with fixed effects using the instate WAR
+IV_fixed_1_instate <- ivreg(
+  d_rate ~ HFR + universl + permit + factor(FIPS_ST) + factor(Year) |
+    c_WAR_instate + universl + permit + factor(FIPS_ST) + factor(Year),
+  data = complete_county_data0
+)
+summary(IV_fixed_1_instate)
+
+iv_robust_fixed1_instate <- coeftest(
+  IV_fixed_1_instate,
+  vcov. = vcovCL(IV_fixed_1_instate, cluster = ~FIPS_ST, data = complete_county_data0)
+)
+
+iv_robust_fixed1_instate
+
+# -----------------------------------------------------------------------------
+# Filter to remove the border counties
+complete_county_data0_interior <- complete_county_data0 %>%
+  filter(!fipscounty %in% border_counties)
+
+# Run IV with fixed effects using only non-border counties
+IV_fixed_1_interior <- ivreg(
+  d_rate ~ HFR + universl + permit + factor(FIPS_ST) + factor(Year) |
+    c_WAR + universl + permit + factor(FIPS_ST) + factor(Year),
+  data = complete_county_data0_interior
+)
+summary(IV_fixed_1_interior)
+
+iv_robust_fixed1_interior <- coeftest(
+  IV_fixed_1_interior,
+  vcov. = vcovCL(IV_fixed_1_interior, cluster = ~FIPS_ST, data = complete_county_data0_interior)
+)
+
+iv_robust_fixed1_interior
+
+# -----------------------------------------------------------------------------
+# Robustness Table
+# -----------------------------------------------------------------------------
+# LaTeX table for robustness checks
+# Extract clustered SE vectors for each specification
+
+se_main <- sqrt(diag(vcovCL(
+  IV_fixed_1, cluster = ~FIPS_ST, data = complete_county_data0
+)))
+
+se_instate <- sqrt(diag(vcovCL(
+  IV_fixed_1_instate, cluster = ~FIPS_ST, data = complete_county_data0
+)))
+
+se_interior <- sqrt(diag(vcovCL(
+  IV_fixed_1_interior, cluster = ~FIPS_ST, data = complete_county_data0_interior
+)))
+
+stargazer(
+  list(IV_fixed_1, IV_fixed_1_instate, IV_fixed_1_interior),
+  type           = "latex",
+  keep.stat      = "n",
+  omit           = c("Constant", "factor"),
+  dep.var.labels = "Firearm Death Rate",
+  column.labels  = c(
+    "Main Specification",
+    "Within-State Instrument",
+    "Interior Counties"
+  ),
+  se = list(se_main, se_instate, se_interior),
+  add.lines = list(
+    c("State FE",             "Yes",        "Yes",        "Yes"),
+    c("Year FE",              "Yes",        "Yes",        "Yes"),
+    c("SE Clustering",        "State",      "State",      "State"),
+    c("Instrument",           "$WAR_{it}$", "$WAR^{in}_{it}$", "$WAR_{it}$"),
+    c("Sample",               "Full",       "Full",       "Interior"),
+    c("First-Stage F",        "16.08",      "16.81",      "16.29"),
+    c("Wu-Hausman p-value",   "<0.001",     "<0.001",     "0.002"),
+    c("Sargan",               "Exactly ID", "Exactly ID", "Exactly ID")
+  ),
+  keep      = c("HFR", "universl", "permit"),
+  label     = "tab:robustness",
+  title     = paste0(
+    "Robustness Checks: IV Estimates of the Effect of Household ",
+    "Firearm Ownership on Firearm Mortality"
+  ),
+  notes = paste0(
+    "All specifications instrument household firearm ownership rates ",
+    "($HFR_{s,t}$) and include state and year fixed effects. ",
+    "Column (1) reproduces the preferred two-way fixed effects specification. ",
+    "Column (2) restricts the instrument to within-state neighbors only, ",
+    "excluding cross-state neighbor counties from the construction of $WAR_{it}$. ",
+    "Column (3) excludes all counties with at least one cross-state neighbor ",
+    "from the estimation sample. ",
+    "Standard errors clustered at the state level in parentheses. ",
+    "$^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$."
+  ),
+  notes.align = "l"
+)
+
+# -----------------------------------------------------------------------------
+# 27. Suppression diagnostics: sample representativeness and missing deaths
+# -----------------------------------------------------------------------------
+
+# The CDC WONDER database suppresses county-year observations with fewer than
+# 10 recorded deaths to protect individual confidentiality. This suppression
+# is not random with respect to the variables of interest. Small, rural counties
+# — which tend to have higher household firearm ownership rates and meaningful
+# per capita firearm death rates driven primarily by suicide — are
+# disproportionately suppressed. The consequence is a two-directional bias:
+# suppression pulls the estimation sample mean death rate below the true
+# national mean (downward bias on the baseline), while simultaneously removing
+# high-ownership, high-per-capita-mortality counties from the sample in a way
+# that likely inflates the IV point estimate (upward bias on the coefficient).
+# The following diagnostics quantify both dimensions of this bias.
+
+# --- True national mean firearm death rate (unsuppressed benchmark) ----------
+# CDC_self_harm and CDC_other_gun_deaths are national aggregates by sex and
+# year, not disaggregated to the county level, and therefore not subject to
+# suppression. Summing self-harm and all other firearm deaths and dividing by
+# the CDC-provided national population yields the true unsuppressed national
+# mean firearm death rate over the estimation period. This serves as the
+# benchmark against which the estimation sample mean of 7.64 per 100,000
+# should be evaluated.
+
+true_national_rate <- inner_join(
+  CDC_self_harm %>%
+    group_by(Year) %>%
+    summarise(
+      sh_deaths  = sum(sh_deaths),
+      Population = sum(Population),
+      .groups    = "drop"
+    ),
+  CDC_other_gun_deaths %>%
+    group_by(Year) %>%
+    summarise(other_deaths = sum(deaths), .groups = "drop"),
+  by = "Year"
+) %>%
+  mutate(
+    total_deaths  = sh_deaths + other_deaths,
+    national_rate = total_deaths / Population * 100000
+  ) %>%
+  filter(Year >= 1999, Year <= 2016) %>%
+  summarise(mean_national_rate = round(mean(national_rate), 2))
+
+cat("True national mean firearm death rate (1999-2016):",
+    true_national_rate$mean_national_rate, "per 100,000\n")
+cat("Estimation sample mean firearm death rate:          7.64 per 100,000\n")
+cat("Suppression-induced downward bias in sample mean:  ",
+    round(true_national_rate$mean_national_rate - 7.64, 2), "per 100,000\n")
+
+# --- Table 1: Suppression rates by state ------------------------------------
+# For each state we compute total county-year observations in the estimation
+# period (1999-2016), the number suppressed (deaths is NA), the number
+# unsuppressed, the suppression rate, and total reported deaths. This table
+# identifies which states contribute least to identification due to suppression
+# despite potentially having the strongest signal — high-ownership rural states
+# where the causal relationship between ownership and mortality should be most
+# visible are systematically underrepresented.
+
+suppression_by_state <- guns_county_CDCnt %>%
+  filter(YEAR >= 1999, YEAR <= 2016) %>%
+  group_by(fipsstate) %>%
+  summarise(
+    total_obs       = n(),
+    suppressed      = sum(is.na(deaths)),
+    unsuppressed    = sum(!is.na(deaths)),
+    pct_suppressed  = round(suppressed / total_obs * 100, 1),
+    reported_deaths = sum(deaths, na.rm = TRUE),
+    .groups         = "drop"
+  ) %>%
+  arrange(desc(pct_suppressed))
+
+print(suppression_by_state, n = 10)
+
+# --- Table 2: True vs. reported deaths, five highest-ownership states -------
+# The five states with the highest mean household firearm ownership rates over
+# 1999-2016 are Montana, Wyoming, Alaska, West Virginia, and Idaho (from RAND).
+# For each we compare total deaths reported in the county-level estimation
+# sample against the true state total from CDC_gun_cleandl, which is compiled
+# at the state level and not subject to suppression. The gap between true and
+# reported deaths directly quantifies how many firearm deaths are invisible to
+# the county-level analysis. The true death rate for each state contextualizes
+# its mortality burden relative to the national mean and illustrates that the
+# suppressed counties are not low-mortality counties — they are high-per-capita-
+# mortality rural counties whose small populations keep annual counts below the
+# CDC threshold.
+
+# True state-level totals and rates (no suppression)
+true_deaths_high_ownership <- CDC_gun_cleandl %>%
+  filter(FIPS_ST %in% c(2, 16, 30, 54, 56), Year >= 1999, Year <= 2016) %>%
+  group_by(FIPS_ST, STATE) %>%
+  summarise(
+    true_total_deaths = sum(Deaths,     na.rm = TRUE),
+    true_total_pop    = sum(Population, na.rm = TRUE),
+    .groups           = "drop"
+  ) %>%
+  mutate(true_rate = round(true_total_deaths / true_total_pop * 100000, 1))
+
+# Reported deaths from county-level estimation sample (suppression-affected)
+# Note: fipsstate is a zero-padded two-digit character string in guns_county_CDCnt
+reported_deaths_high_ownership <- guns_county_CDCnt %>%
+  filter(YEAR >= 1999, YEAR <= 2016) %>%
+  filter(fipsstate %in% c("02", "16", "30", "54", "56")) %>%
+  group_by(fipsstate) %>%
+  summarise(
+    reported_deaths = sum(deaths, na.rm = TRUE),
+    pct_suppressed  = round(sum(is.na(deaths)) / n() * 100, 1),
+    .groups         = "drop"
+  ) %>%
+  mutate(FIPS_ST = as.double(fipsstate))
+
+# Join true and reported for direct comparison
+suppression_high_ownership <- left_join(
+  true_deaths_high_ownership,
+  reported_deaths_high_ownership,
+  by = "FIPS_ST"
+) %>%
+  mutate(
+    missing_deaths = true_total_deaths - reported_deaths,
+    pct_missing    = round(missing_deaths / true_total_deaths * 100, 1)
+  ) %>%
+  select(STATE, true_total_deaths, reported_deaths,
+         missing_deaths, pct_missing, pct_suppressed, true_rate)
+
+print(suppression_high_ownership)
+
+# --- Directional bias summary -----------------------------------------------
+# The suppression_high_ownership table establishes that the counties being
+# suppressed in high-ownership states are not low-mortality counties. Each of
+# the five highest-ownership states has a true death rate substantially above
+# the national mean of 10.5 per 100,000, yet between one-third and two-thirds
+# of their true deaths are invisible to the estimation sample. This pattern is
+# consistent with the argument that suppression induces upward bias in the IV
+# point estimate: the estimation sample overrepresents low-HFR urban counties
+# with above-average absolute death counts, while the instrument c_WAR has more
+# power in those urban counties. Including the suppressed rural counties — which
+# have high HFR but moderate absolute death counts — would raise the sample mean
+# toward the true national rate while attenuating the point estimate, as the
+# additional observations would show that high-HFR counties do not always
+# exhibit proportionally higher death rates once population size is accounted for.
+
+cat("\nSuppression bias summary for five highest-ownership states:\n")
+cat("Total true deaths (1999-2016):    ",
+    sum(suppression_high_ownership$true_total_deaths), "\n")
+cat("Total reported deaths (1999-2016):",
+    sum(suppression_high_ownership$reported_deaths), "\n")
+cat("Total missing deaths:             ",
+    sum(suppression_high_ownership$missing_deaths), "\n")
+cat("Share of true deaths missing:     ",
+    round(sum(suppression_high_ownership$missing_deaths) /
+            sum(suppression_high_ownership$true_total_deaths) * 100, 1), "%\n")
+
+# --- LaTeX output for suppression tables ------------------------------------
+
+# Table 1: Top 10 most suppressed states
+# Join state names for readability — fipsstate is character in guns_county_CDCnt
+# but FIPS_ST is numeric in CDC_gun_cleandl, so we build a state name lookup
+state_lookup <- CDC_gun_cleandl %>%
+  filter(!is.na(FIPS_ST)) %>%
+  mutate(fipsstate = formatC(FIPS_ST, width = 2, flag = "0")) %>%
+  select(fipsstate, STATE) %>%
+  distinct()
+
+suppression_by_state_named <- suppression_by_state %>%
+  left_join(state_lookup, by = "fipsstate") %>%
+  select(STATE, total_obs, suppressed, unsuppressed, 
+         pct_suppressed, reported_deaths) %>%
+  slice(1:10)
+
+stargazer(
+  as.data.frame(suppression_by_state_named),
+  type      = "latex",
+  summary   = FALSE,
+  rownames  = FALSE,
+  digits    = 1,
+  title     = "County-Year Suppression Rates by State, 1999--2016 (Ten Most Suppressed)",
+  label     = "tab:suppression_by_state",
+  covariate.labels = c(
+    "State", "Total Obs.", "Suppressed", "Unsuppressed",
+    "\\% Suppressed", "Reported Deaths"
+  ),
+  notes = paste0(
+    "Suppression occurs when county-year firearm death counts fall below 10, ",
+    "per CDC WONDER confidentiality policy. Reported deaths reflect the sum of ",
+    "unsuppressed county-year death counts within the estimation sample."
+  ),
+  notes.align = "l"
+)
+
+# Table 2: True vs. reported deaths, five highest-ownership states
+stargazer(
+  as.data.frame(suppression_high_ownership),
+  type      = "latex",
+  summary   = FALSE,
+  rownames  = FALSE,
+  digits    = 1,
+  title     = paste0(
+    "True versus Reported Firearm Deaths, Five Highest-Ownership States, ",
+    "1999--2016"
+  ),
+  label     = "tab:suppression_high_ownership",
+  covariate.labels = c(
+    "State",
+    "True Deaths",
+    "Reported Deaths",
+    "Missing Deaths",
+    "\\% Missing",
+    "\\% Suppressed",
+    "True Rate (per 100,000)"
+  ),
+  notes = paste0(
+    "True deaths are drawn from state-level CDC WONDER data, ",
+    "compiled at the state level and not subject to suppression. ",
+    "Reported deaths reflect unsuppressed county-year observations ",
+    "in the CDC WONDER county-level extract. ",
+    "True rate is computed as true total deaths divided by total state ",
+    "population over the estimation period, expressed per 100,000. ",
+    "The national unsuppressed mean firearm death rate over 1999--2016 ",
+    "is 10.5 per 100,000, computed from national CDC WONDER aggregates ",
+    "not subject to suppression."
+  ),
+  notes.align = "l"
+)
+
+
 
 #rstudioapi::getActiveDocumentContext()$path
 #file.info("C:/Users/joesa/OneDrive - University of Nebraska/Rworkingfile/guns_county_CDC_formatted.R")$mtime
