@@ -325,46 +325,45 @@ ggplot(data = NatAvg_D, aes(x = Year)) +
   theme_gray()
 
 # National average gun death rate by year
-# RATE from CDC_gun_cleandl is the CDC-computed state-level death rate
-# per 100,000, not subject to county-level suppression
-# Mean across states is unweighted — consistent with prior figure
+# Two series: CDC state-level rate (unsuppressed) vs county estimation 
+# sample mean (suppression-affected)
+# County-level mean computed from guns_county_CDCnt which is available here
+# d_rate is deaths/population (per capita), multiply by 100000 for rate
 
 NatAvg_D <- CDC_gun_cleandl %>%
   filter(!is.na(RATE)) %>%
   group_by(Year) %>%
   summarise(
-    sample_mean = mean(RATE),      # unweighted state mean (existing series)
-    .groups     = "drop"
+    state_mean = mean(RATE),
+    .groups    = "drop"
   )
 
-# County-level estimation sample mean by year for comparison
-sample_mean_by_year <- complete_county_data0 %>%
-  filter(!is.na(d_rate)) %>%
-  group_by(Year) %>%
+county_mean_by_year <- guns_county_CDCnt %>%
+  filter(!is.na(d_rate), YEAR >= 1999, YEAR <= 2020) %>%
+  group_by(YEAR) %>%
   summarise(
     county_mean = mean(d_rate * 100000, na.rm = TRUE),
     .groups     = "drop"
-  )
+  ) %>%
+  rename(Year = YEAR)
 
-plot_data_D <- left_join(NatAvg_D, sample_mean_by_year, by = "Year")
+plot_data_D <- left_join(NatAvg_D, county_mean_by_year, by = "Year")
 
 ggplot(data = plot_data_D, aes(x = Year)) +
-  geom_line(aes(y = sample_mean, color = "State-Level CDC Rate"),
+  geom_line(aes(y = state_mean, color = "State-Level CDC Rate"),
             linewidth = 0.9) +
-  geom_point(aes(y = sample_mean, color = "State-Level CDC Rate"), size = 3) +
-  geom_line(aes(y = county_mean, color = "County Estimation Sample Mean"),
+  geom_point(aes(y = state_mean, color = "State-Level CDC Rate"), size = 3) +
+  geom_line(aes(y = county_mean, color = "County Sample Mean"),
             linewidth = 0.9, linetype = "dashed") +
-  geom_point(aes(y = county_mean, color = "County Estimation Sample Mean"),
-             size = 3) +
+  geom_point(aes(y = county_mean, color = "County Sample Mean"), size = 3) +
   scale_color_manual(
     values = c(
-      "State-Level CDC Rate"          = "blue",
-      "County Estimation Sample Mean" = "red"
+      "State-Level CDC Rate" = "blue",
+      "County Sample Mean"   = "red"
     )
   ) +
-  scale_x_continuous(limits = c(1999, 2016)) +
   labs(
-    title = "Mean Deaths Per 100,000 by Year",
+    title = "Mean Firearm Deaths Per 100,000 by Year",
     x     = "Year",
     y     = "Deaths Per 100,000",
     color = ""
@@ -519,6 +518,38 @@ ggplot(plot_data, aes(x = Year, y = Deaths, fill = cause)) +
     legend.position = "bottom",
     strip.text      = element_text(face = "bold")
   )
+
+# -----------------------------------------------------------------------------
+# Number of unsuppressed county-year observations by year
+# Unsuppressed defined as non-missing d_rate (deaths > 9)
+# Restricted to estimation period 1999-2016 for relevance
+# but also showing full 1999-2020 range to see post-2016 trend
+
+unsuppressed_by_year <- guns_county_CDCnt %>%
+  group_by(YEAR) %>%
+  summarise(
+    total_obs       = n(),
+    unsuppressed    = sum(!is.na(deaths)),
+    suppressed      = sum(is.na(deaths)),
+    pct_unsuppressed = round(unsuppressed / total_obs * 100, 1),
+    .groups         = "drop"
+  ) %>%
+  arrange(YEAR)
+
+print(unsuppressed_by_year, n = 22)
+
+ggplot(data = unsuppressed_by_year, aes(x = YEAR)) +
+  geom_line(aes(y = unsuppressed), color = "blue", linewidth = 0.9) +
+  geom_point(aes(y = unsuppressed), color = "blue", size = 3) +
+  geom_vline(xintercept = 2010, linetype = "dashed", color = "gray50") +
+  annotate("text", x = 2010.3, y = max(unsuppressed_by_year$unsuppressed) * 0.95,
+           label = "McDonald (2010)", hjust = 0, size = 3.5) +
+  labs(
+    title = "Number of Unsuppressed County-Year Observations by Year",
+    x     = "Year",
+    y     = "Unsuppressed Counties"
+  ) +
+  theme_gray()
 
 # -----------------------------------------------------------------------------
 # 13. Summary statistics: CDC WONDER county-level coverage
@@ -1053,40 +1084,32 @@ stargazer(
 # that likely inflates the IV point estimate (upward bias on the coefficient).
 # The following diagnostics quantify both dimensions of this bias.
 
-# --- True national mean firearm death rate (unsuppressed benchmark) ----------
-# CDC_self_harm and CDC_other_gun_deaths are national aggregates by sex and
-# year, not disaggregated to the county level, and therefore not subject to
-# suppression. Summing self-harm and all other firearm deaths and dividing by
-# the CDC-provided national population yields the true unsuppressed national
-# mean firearm death rate over the estimation period. This serves as the
-# benchmark against which the estimation sample mean of 7.64 per 100,000
-# should be evaluated.
+# True national mean firearm death rate (unsuppressed benchmark)
+# Uses CDC-computed state-level rates from CDC_gun_cleandl, which are not
+# subject to county-level suppression and cover all firearm deaths at the
+# state level. The unweighted mean across states is computed for consistency
+# with the existing descriptive figures. The estimation sample mean of 7.64
+# is the mean of d_rate * 100000 across non-suppressed county-year
+# observations in complete_county_data0, which is downward biased due to
+# the systematic exclusion of small rural counties by CDC suppression.
 
-true_national_rate <- inner_join(
-  CDC_self_harm %>%
-    group_by(Year) %>%
-    summarise(
-      sh_deaths  = sum(sh_deaths),
-      Population = sum(Population),
-      .groups    = "drop"
-    ),
-  CDC_other_gun_deaths %>%
-    group_by(Year) %>%
-    summarise(other_deaths = sum(deaths), .groups = "drop"),
-  by = "Year"
-) %>%
-  mutate(
-    total_deaths  = sh_deaths + other_deaths,
-    national_rate = total_deaths / Population * 100000
-  ) %>%
-  filter(Year >= 1999, Year <= 2016) %>%
-  summarise(mean_national_rate = round(mean(national_rate), 2))
+true_national_rate <- CDC_gun_cleandl %>%
+  filter(!is.na(RATE), Year >= 1999, Year <= 2016) %>%
+  group_by(Year) %>%
+  summarise(annual_mean = mean(RATE), .groups = "drop") %>%
+  summarise(mean_national_rate = round(mean(annual_mean), 2))
+
+estimation_sample_mean <- round(
+  mean(complete_county_data0$d_rate * 100000, na.rm = TRUE), 2
+)
 
 cat("True national mean firearm death rate (1999-2016):",
     true_national_rate$mean_national_rate, "per 100,000\n")
-cat("Estimation sample mean firearm death rate:          7.64 per 100,000\n")
+cat("Estimation sample mean firearm death rate:         ",
+    estimation_sample_mean, "per 100,000\n")
 cat("Suppression-induced downward bias in sample mean:  ",
-    round(true_national_rate$mean_national_rate - 7.64, 2), "per 100,000\n")
+    round(true_national_rate$mean_national_rate - estimation_sample_mean, 2),
+    "per 100,000\n")
 
 # --- Table 1: Suppression rates by state ------------------------------------
 # For each state we compute total county-year observations in the estimation
@@ -1168,16 +1191,17 @@ print(suppression_high_ownership)
 # The suppression_high_ownership table establishes that the counties being
 # suppressed in high-ownership states are not low-mortality counties. Each of
 # the five highest-ownership states has a true death rate substantially above
-# the national mean of 10.5 per 100,000, yet between one-third and two-thirds
-# of their true deaths are invisible to the estimation sample. This pattern is
-# consistent with the argument that suppression induces upward bias in the IV
-# point estimate: the estimation sample overrepresents low-HFR urban counties
-# with above-average absolute death counts, while the instrument c_WAR has more
-# power in those urban counties. Including the suppressed rural counties — which
-# have high HFR but moderate absolute death counts — would raise the sample mean
-# toward the true national rate while attenuating the point estimate, as the
-# additional observations would show that high-HFR counties do not always
-# exhibit proportionally higher death rates once population size is accounted for.
+# the national unsuppressed mean of 11.77 per 100,000, yet between one-third 
+# and two-thirds of their true deaths are invisible to the estimation sample. 
+# This pattern is consistent with the argument that suppression induces upward 
+# bias in the IV point estimate: the estimation sample overrepresents low-HFR 
+# urban counties with above-average absolute death counts, while the instrument 
+# c_WAR has more power in those urban counties. Including the suppressed rural 
+# counties — which have high HFR but moderate absolute death counts — would 
+# raise the sample mean toward the true national rate while attenuating the 
+# point estimate, as the additional observations would show that high-HFR 
+# counties do not always exhibit proportionally higher death rates once 
+# population size is accounted for.
 
 cat("\nSuppression bias summary for five highest-ownership states:\n")
 cat("Total true deaths (1999-2016):    ",
@@ -1249,15 +1273,16 @@ stargazer(
     "True Rate (per 100,000)"
   ),
   notes = paste0(
-    "True deaths are drawn from state-level CDC WONDER data, ",
-    "compiled at the state level and not subject to suppression. ",
-    "Reported deaths reflect unsuppressed county-year observations ",
-    "in the CDC WONDER county-level extract. ",
+    "True deaths are drawn from state-level CDC WONDER data not subject ",
+    "to suppression. Reported deaths reflect unsuppressed county-year ",
+    "observations in the CDC WONDER county-level extract. ",
     "True rate is computed as true total deaths divided by total state ",
     "population over the estimation period, expressed per 100,000. ",
     "The national unsuppressed mean firearm death rate over 1999--2016 ",
-    "is 10.5 per 100,000, computed from national CDC WONDER aggregates ",
-    "not subject to suppression."
+    "is ", true_national_rate$mean_national_rate, " per 100,000, computed ",
+    "as the unweighted mean of CDC state-level firearm death rates. ",
+    "States are ranked by mean household firearm ownership rate over the ",
+    "estimation period per RAND Corporation estimates."
   ),
   notes.align = "l"
 )
