@@ -31,18 +31,6 @@ with a 95% confidence interval of [3.98, 13.09] additional deaths per 100,000
 per percentage point increase in HFR, converted from the per capita units of 
 the estimation.
 
-CDC suppression of county-year observations with nine or fewer deaths 
-disproportionately excludes small rural counties with high ownership rates, 
-generating a downward-biased estimation sample mean of 7.64 per 100,000 
-relative to the true national unsuppressed mean of 11.77 per 100,000. Three 
-robustness checks — a reduced-form specification, restriction of the instrument 
-to within-state neighbors only, and exclusion of border counties — confirm the 
-directional finding but reveal systematic attenuation of the point estimate 
-(from 0.00653 to 0.00434 to 0.00288) as sources of cross-state spatial 
-variation are progressively removed. This attenuation is partly attributable 
-to the suppression-driven sample composition, which overrepresents large urban 
-counties where the instrument has the most power.
-
 ---
 
 ## Repository Structure
@@ -122,82 +110,6 @@ LaTeX distribution. Compiled and maintained via Overleaf.
 
 ---
 
-## Identification Strategy
-
-The instrument is the population-weighted leave-one-out mean murder arrest 
-rate of counties neighboring county *i*:
-
-WAR_it = Σ_{j≠i} p_jt × ar_jt
-
-where ar_jt is the murder arrest rate in county j at time t and p_jt is 
-the population weight of county j among all counties adjacent to i.
-
-Murder arrest rates are used in preference to murder rates for three reasons. 
-First, studies using UCR-based murder rates typically exclude Florida, as the 
-state reports crime statistics through the Florida Department of Law Enforcement 
-rather than directly to the FBI UCR system. Florida is the third most populous 
-state and home to several of the largest metropolitan areas in the sample; 
-excluding it would constitute a substantial and non-random omission. The 
-administrative act of arresting an individual for murder is defined consistently 
-in statute regardless of which state-level reporting system records it, making 
-arrest data portable across reporting systems. Second, if firearm ownership 
-deters crime, higher local gun ownership would reduce murders in neighboring 
-counties, attenuating the first-stage relationship; any bias from this channel 
-runs against finding a positive effect of ownership on mortality, making the 
-estimates conservative. Third, murder rates are subject to variation in 
-reporting practices and case clearance rates across jurisdictions, while arrest 
-rates reflect a more uniformly defined administrative event.
-
----
-
-## Robustness
-
-Three robustness checks address spatial autocorrelation concerns:
-
-1. **Reduced form:** Direct regression of the firearm death rate on WAR_it 
-   confirms the instrument operates on the outcome in the expected direction 
-   (coefficient = 0.123, p = 0.003, state-clustered).
-
-2. **Within-state instrument:** Restricting WAR_it to within-state neighbors 
-   only removes cross-state spatial correlation as a potential source of bias. 
-   The HFR coefficient attenuates from 0.00653 to 0.00434 (34% reduction) and 
-   loses significance under state-clustered standard errors, though the sign 
-   is preserved and the Wu-Hausman test continues to reject exogeneity.
-
-3. **Interior counties only:** Excluding all counties with at least one 
-   cross-state neighbor reduces the sample from 19,922 to 13,224 observations. 
-   The HFR coefficient attenuates further to 0.00288 (56% reduction from the 
-   main specification). The sign remains positive and the Wu-Hausman test 
-   rejects exogeneity (p = 0.002).
-
-The monotone attenuation pattern is partly attributable to the suppression-driven 
-sample composition, which overrepresents large urban counties where cross-state 
-spatial variation is most pronounced.
-
----
-
-## Suppression and Sample Representativeness
-
-The CDC WONDER database suppresses county-year observations with nine or fewer 
-deaths, disproportionately excluding small rural counties with high firearm 
-ownership rates. Key findings from the suppression diagnostics:
-
-- The estimation sample mean of 7.64 deaths per 100,000 substantially 
-  understates the true national unsuppressed mean of 11.77 per 100,000.
-- Across the five highest-ownership states (Montana, Wyoming, Alaska, West 
-  Virginia, and Idaho), 7,523 firearm deaths — 51.2% of the true total of 
-  14,707 — are invisible to the county-level estimation sample.
-- Wyoming loses 66.8% of its true deaths to suppression; West Virginia 59.8%; 
-  Montana 49.6%.
-- Each of these states has a true firearm death rate substantially above the 
-  national unsuppressed mean: Alaska at 18.4, Wyoming at 16.1, Montana at 15.9, 
-  West Virginia at 14.4, and Idaho at 12.5 per 100,000.
-- The number of unsuppressed county-year observations rises by approximately 
-  10% after 2010, consistent with rising firearm mortality pulling previously 
-  suppressed observations above the nine-death threshold.
-
----
-
 ## Script Structure
 
 The main analysis script `guns_county_CDC_formatted.R` is organized into 
@@ -242,7 +154,7 @@ The main analysis script `guns_county_CDC_formatted.R` is organized into
 The LaTeX dissertation is maintained in Overleaf and synced to this 
 repository. The document uses the University of Nebraska-Lincoln `nuthesis` 
 class. To compile locally ensure `nuthesis.cls` and `aea.bst` are in the 
-same directory as `dissertation_template.tex`.
+same directory as `firarms.tex`.
 
 ---
 

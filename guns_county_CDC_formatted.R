@@ -520,38 +520,6 @@ ggplot(plot_data, aes(x = Year, y = Deaths, fill = cause)) +
   )
 
 # -----------------------------------------------------------------------------
-# Number of unsuppressed county-year observations by year
-# Unsuppressed defined as non-missing d_rate (deaths > 9)
-# Restricted to estimation period 1999-2016 for relevance
-# but also showing full 1999-2020 range to see post-2016 trend
-
-unsuppressed_by_year <- guns_county_CDCnt %>%
-  group_by(YEAR) %>%
-  summarise(
-    total_obs       = n(),
-    unsuppressed    = sum(!is.na(deaths)),
-    suppressed      = sum(is.na(deaths)),
-    pct_unsuppressed = round(unsuppressed / total_obs * 100, 1),
-    .groups         = "drop"
-  ) %>%
-  arrange(YEAR)
-
-print(unsuppressed_by_year, n = 22)
-
-ggplot(data = unsuppressed_by_year, aes(x = YEAR)) +
-  geom_line(aes(y = unsuppressed), color = "blue", linewidth = 0.9) +
-  geom_point(aes(y = unsuppressed), color = "blue", size = 3) +
-  geom_vline(xintercept = 2010, linetype = "dashed", color = "gray50") +
-  annotate("text", x = 2010.3, y = max(unsuppressed_by_year$unsuppressed) * 0.95,
-           label = "McDonald (2010)", hjust = 0, size = 3.5) +
-  labs(
-    title = "Number of Unsuppressed County-Year Observations by Year",
-    x     = "Year",
-    y     = "Unsuppressed Counties"
-  ) +
-  theme_gray()
-
-# -----------------------------------------------------------------------------
 # 13. Summary statistics: CDC WONDER county-level coverage
 # -----------------------------------------------------------------------------
 
@@ -1287,7 +1255,40 @@ stargazer(
   notes.align = "l"
 )
 
+# Number of unsuppressed county-year observations by year
+# Unsuppressed defined as non-missing d_rate (deaths > 9)
+# Restricted to estimation period 1999-2016 for relevance
+# but also showing full 1999-2020 range to see post-2016 trend
 
+unsuppressed_by_year <- guns_county_CDCnt %>%
+  group_by(YEAR) %>%
+  summarise(
+    total_obs       = n(),
+    unsuppressed    = sum(!is.na(deaths)),
+    suppressed      = sum(is.na(deaths)),
+    pct_unsuppressed = round(unsuppressed / total_obs * 100, 1),
+    .groups         = "drop"
+  ) %>%
+  arrange(YEAR)
+
+print(unsuppressed_by_year, n = 22)
+
+ggplot(data = unsuppressed_by_year, aes(x = YEAR)) +
+  geom_line(aes(y = unsuppressed), color = "blue", linewidth = 0.9) +
+  geom_point(aes(y = unsuppressed), color = "blue", size = 3) +
+  geom_vline(xintercept = 2010, linetype = "dashed", color = "gray50") +
+  annotate("text", x = 2010.3, y = max(unsuppressed_by_year$unsuppressed) * 0.95,
+           label = "McDonald (2010)", hjust = 0, size = 3.5) +
+  labs(
+    title = "Number of Unsuppressed County-Year Observations by Year",
+    x     = "Year",
+    y     = "Unsuppressed Counties"
+  ) +
+  geom_vline(xintercept = 2016, linetype = "dotted", color = "gray50") +
+  annotate("text", x = 2016.3, 
+           y = max(unsuppressed_by_year$unsuppressed) * 0.88,
+           label = "Estimation period ends", hjust = 0, size = 3.5)+
+  theme_gray()
 
 #rstudioapi::getActiveDocumentContext()$path
 #file.info("C:/Users/joesa/OneDrive - University of Nebraska/Rworkingfile/guns_county_CDC_formatted.R")$mtime
