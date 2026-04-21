@@ -32,3 +32,8 @@ BRFSS_2004_Gun_Ownership/
 # Unused/legacy scripts
 working_gun.R
 .positai
+
+#pdf files unless in the FIgure folder
+*.pdf
+!Figures/*.pdf
+!unl.pdf
