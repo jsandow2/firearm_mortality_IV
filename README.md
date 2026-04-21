@@ -154,7 +154,7 @@ The main analysis script `guns_county_CDC_formatted.R` is organized into
 The LaTeX dissertation is maintained in Overleaf and synced to this 
 repository. The document uses the University of Nebraska-Lincoln `nuthesis` 
 class. To compile locally ensure `nuthesis.cls` and `aea.bst` are in the 
-same directory as `firarms.tex`.
+same directory as `firearms.tex`.
 
 ---
 
