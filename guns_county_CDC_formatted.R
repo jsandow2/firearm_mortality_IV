@@ -10,25 +10,19 @@
 
 rm(list = ls())
 graphics.off()
-
-library(readr)
-library(readxl)
-library(haven)
-library(labelled)
-library(tidyverse)
-library(dplyr)
-library(ggplot2)
-library(broom)
-library(plm)
-library(lmtest)
-library(AER)
-library(ivreg)
-library(sandwich)
-library(ivmodel)
-library(stargazer)
-library(tinytex)
-library(prettyR)
-library(eventstudyr)
+# ── Packages ──────────────────────────────────────────────────────────────────
+library(readr)      # reading .csv and delimited text files (read_csv, read_delim)
+library(readxl)     # reading Excel files (read_excel)
+library(haven)      # reading Stata .dta files (load via load(); .rda files)
+library(tidyverse)  # data manipulation and reshaping (dplyr, tidyr, purrr)
+library(ggplot2)    # all figures and descriptive plots
+library(plm)        # panel data IV regressions (plm, vcovHC)
+library(lmtest)     # hypothesis testing for regression models (coeftest)
+library(AER)        # Wu-Hausman endogeneity test via ivreg diagnostics
+library(ivreg)      # primary 2SLS IV estimation (ivreg)
+library(sandwich)   # clustered and heteroskedasticity-robust standard errors (vcovCL)
+library(ivmodel)    # Anderson-Rubin weak-instrument-robust inference (ivmodel)
+library(stargazer)  # LaTeX and text regression output tables
 
 # -----------------------------------------------------------------------------
 # 1. Load raw data
@@ -147,10 +141,12 @@ leaic$ORI7     <- trimws(toupper(as.character(leaic$ORI7)))
 arrests_w <- left_join(arrests_w, leaic, by = "ORI7") %>%
   filter(FIPS_ST != 12)
 
-# Remove DC FIPS range filter and aggregate to county-year level
+# Aggregate to county-year level
 arrests_w <- arrests_w %>%
-  mutate(FIPS = as.numeric(as.character(FIPS))) %>%
-  filter(!(FIPS <= 11999 & FIPS >= 13000))
+  mutate(FIPS = as.numeric(as.character(FIPS)))
+# Note: D.C. (FIPS 11001) is retained in the full sample; a separate
+# post-2008 indicator (1{decision}) captures the earlier application
+# of Heller to federal jurisdictions. See Section 4 for details.
 
 arrests_off_year <- arrests_w %>%
   group_by(FIPS, YEAR) %>%

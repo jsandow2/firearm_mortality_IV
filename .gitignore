@@ -19,6 +19,7 @@
 
 # Image files
 *.png
+*.eps
 
 # BRFSS folders
 BRFSS_2001_Gun_Ownership/
@@ -36,4 +37,4 @@ working_gun.R
 #pdf files unless in the FIgure folder
 *.pdf
 !Figures/*.pdf
-!unl.pdf
+
