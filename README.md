@@ -4,7 +4,7 @@
 
 **Author:** Joe Sandow  
 **Institution:** University of Nebraska-Lincoln  
-**Status:** Dissertation Chapter 2 (in progress)
+**Status:** Dissertation Chapter 1 (in progress)
 
 ---
 
