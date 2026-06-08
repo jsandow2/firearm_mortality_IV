@@ -20,7 +20,9 @@ $\mathbbm{1}\{decision\}$ & & & 0.00002$^{**}$ \\
 State FE           & No           & Yes          & Yes \\
 Year FE            & No           & Yes          & No \\
 SE Clustering      & State        & State        & State \\
+Instrument         & $WAR_{it}$   & $WAR_{it}$   & $WAR_{it}$ \\
 First-Stage F      & 60.09        & 16.08        & 38.28 \\
+Effective F        & ---          & 5.14         & --- \\
 Wu-Hausman $p$     & $<$0.001     & $<$0.001     & $<$0.001 \\
 Sargan             & Exactly ID   & Exactly ID   & Exactly ID \\
 Observations       & \multicolumn{3}{c}{19,922} \\
@@ -37,9 +39,12 @@ represents the preferred specification. Column (3) replaces year fixed
 effects with $\mathbbm{1}\{decision_{i,t}\}$, equal to one for observations 
 after 2010. $\mathbbm{1}\{universal_{s,t}\}$ and $\mathbbm{1}\{permit_{s,t}\}$ 
 indicate states with universal background check and concealed carry permit 
-requirements, respectively. The Wu-Hausman test rejects the null of exogeneity 
-in all specifications. The model is exactly identified and the Sargan 
-overidentification test is not applicable. Standard errors clustered at the 
-state level in parentheses. $^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$.
+requirements, respectively. The conventional first-stage F is reported 
+without clustering; the Olea-Pflueger effective F accounts for the clustering 
+structure and is reported for Column (2). The Wu-Hausman test rejects the 
+null of exogeneity in all specifications. The model is exactly identified in 
+all specifications and the Sargan overidentification test is not applicable. 
+Standard errors clustered at the state level in parentheses. 
+$^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$.
 \end{minipage}
 \end{table}
