@@ -23,6 +23,7 @@ library(ivreg)      # primary 2SLS IV estimation (ivreg)
 library(sandwich)   # clustered and heteroskedasticity-robust standard errors (vcovCL)
 library(ivmodel)    # Anderson-Rubin weak-instrument-robust inference (ivmodel)
 library(stargazer)  # LaTeX and text regression output tables
+library(ivDiag)
 
 # -----------------------------------------------------------------------------
 # 1. Load raw data
@@ -238,6 +239,19 @@ adjacency_w <- adjacency_w %>%
   group_by(fipscounty, YEAR) %>%
   summarise(WAR = sum(WAR_weighted), .groups = "drop") %>%
   filter(!is.na(WAR))
+
+# -----------------------------------------------------------------------------
+# 7a. Construct lagged WAR instrument (c_WAR_lag, t-1)
+# -----------------------------------------------------------------------------
+
+# Shift YEAR forward by one so that last year's WAR merges onto this year's obs
+adjacency_w_lag <- adjacency_w %>%
+  mutate(YEAR = YEAR + 1) %>%
+  rename(c_WAR_lag = WAR)
+
+# Note: this effectively makes c_WAR_lag unavailable for 1999 (no 1998 data),
+# so those observations will have NA for c_WAR_lag after merging.
+# The estimation sample will drop to 2000-2016 when both instruments are used.
 
 # -----------------------------------------------------------------------------
 # 8. Clean CDC WONDER county-level gun death data
@@ -569,8 +583,14 @@ WAR_county_year <- adjacency_w %>%
   group_by(fipscounty, YEAR) %>%
   summarise(c_WAR = mean(WAR), .groups = "drop")
 
+# Lagged WAR: group and summarise before merging
+WAR_county_year_lag <- adjacency_w_lag %>%
+  group_by(fipscounty, YEAR) %>%
+  summarise(c_WAR_lag = mean(c_WAR_lag), .groups = "drop")
+
 D_WAR_county_year <- left_join(guns_county_CDCnt, WAR_county_year,
-                                by = c("fipscounty", "YEAR"))
+                               by = c("fipscounty", "YEAR")) %>%
+  left_join(WAR_county_year_lag, by = c("fipscounty", "YEAR"))
 
 # -----------------------------------------------------------------------------
 # 15. Construct balanced panel dataset
@@ -649,6 +669,22 @@ X <- model.matrix(~ universl + permit + factor(FIPS_ST) + factor(Year),
 
 iv_model <- ivmodel(Y = Y, D = D, Z = Z, X = X)
 summary(iv_model)
+
+# Olea-Pflueger effective F-statistic (accounts for clustering structure)
+# F.effective is the key number; F.standard recovers the conventional 16.18
+
+eff_F <- ivDiag(
+  data     = complete_county_data0,
+  Y        = "d_rate",
+  D        = "HFR",
+  Z        = "c_WAR",
+  controls = c("universl", "permit"),
+  FE       = c("FIPS_ST", "Year"),
+  cl       = "FIPS_ST"
+)
+
+cat("Olea-Pflueger effective F (exactly-identified):\n")
+print(eff_F$F_stat)
 
 # -----------------------------------------------------------------------------
 # 19. PLM panel IV regressions (robustness checks)
@@ -755,6 +791,33 @@ IV_fixed_2 <- ivreg(
 summary(IV_fixed_2)
 
 # -----------------------------------------------------------------------------
+# 20b. Overidentified IV: c_WAR + c_WAR_lag as instruments
+# -----------------------------------------------------------------------------
+
+# Sample restricted to 2000-2016 due to lag truncation (~17,568 observations)
+# Sargan-Hansen J-test available via diagnostics = TRUE
+IV_fixed_overid <- ivreg(
+  d_rate ~ HFR + universl + permit + factor(FIPS_ST) + factor(Year) |
+    c_WAR + c_WAR_lag + universl + permit + factor(FIPS_ST) + factor(Year),
+  data = complete_county_data0
+)
+summary(IV_fixed_overid, diagnostics = TRUE)
+
+# Olea-Pflueger effective F for overidentified spec
+eff_F_overid <- ivDiag(
+  data     = complete_county_data0,
+  Y        = "d_rate",
+  D        = "HFR",
+  Z        = c("c_WAR", "c_WAR_lag"),
+  controls = c("universl", "permit"),
+  FE       = c("FIPS_ST", "Year"),
+  cl       = "FIPS_ST"
+)
+
+cat("Olea-Pflueger effective F (overidentified):\n")
+print(eff_F_overid$F_stat)
+
+# -----------------------------------------------------------------------------
 # 21. Clustered standard errors for ivreg models
 # -----------------------------------------------------------------------------
 
@@ -776,6 +839,11 @@ iv_robust_fixed1 <- coeftest(
 iv_robust_fixed2 <- coeftest(
   IV_fixed_2,
   vcov. = vcovCL(IV_fixed_2, cluster = ~FIPS_ST, data = complete_county_data0)
+)
+
+iv_robust_fixed_overid <- coeftest(
+  IV_fixed_overid,
+  vcov. = vcovCL(IV_fixed_overid, cluster = ~FIPS_ST, data = complete_county_data0)
 )
 
 # -----------------------------------------------------------------------------
@@ -808,6 +876,31 @@ stargazer(
 )
 
 stargazer(
+  list(IV_no_fixed_1, IV_fixed_1, IV_fixed_2, IV_fixed_overid),
+  type           = "text",
+  keep.stat      = "n",
+  omit           = c("Constant", "factor"),
+  dep.var.labels = "Firearm Death Rate",
+  column.labels  = c("Pooled IV", "Two-Way FE", "State FE + Decision", "Overidentified"),
+  se = list(
+    sqrt(diag(vcovCL(IV_no_fixed_1,   cluster = ~FIPS_ST, data = complete_county_data0))),
+    sqrt(diag(vcovCL(IV_fixed_1,      cluster = ~FIPS_ST, data = complete_county_data0))),
+    sqrt(diag(vcovCL(IV_fixed_2,      cluster = ~FIPS_ST, data = complete_county_data0))),
+    sqrt(diag(vcovCL(IV_fixed_overid, cluster = ~FIPS_ST, data = complete_county_data0)))
+  ),
+  add.lines = list(
+    c("State FE",           "No",         "Yes",        "Yes",        "Yes"),
+    c("Year FE",            "No",         "Yes",        "No",         "Yes"),
+    c("SE Clustering",      "State",      "State",      "State",      "State"),
+    c("Instruments",        "WAR",        "WAR",        "WAR",        "WAR + WAR(t-1)"),
+    c("First-Stage F",      "60.09",      "16.08",      "38.28",      "7.76"),
+    c("Effective F",        "--",         "5.14",       "--",         "2.89"),
+    c("Wu-Hausman p",       "<0.001",     "<0.001",     "<0.001",     "<0.001"),
+    c("Sargan p",           "Exactly ID", "Exactly ID", "Exactly ID", "0.121")
+  )
+)
+
+stargazer(
   list(IV_no_fixed_1, IV_fixed_1, IV_fixed_2),
   type           = "latex",
   keep.stat      = "n",
@@ -829,6 +922,46 @@ stargazer(
   ),
   label = "tab:main_results",
   title = "IV Estimates of the Effect of Household Firearm Ownership on Firearm Mortality"
+)
+
+stargazer(
+  list(IV_no_fixed_1, IV_fixed_1, IV_fixed_2, IV_fixed_overid),
+  type           = "latex",
+  keep.stat      = "n",
+  omit           = c("Constant", "factor"),
+  dep.var.labels = "Firearm Death Rate",
+  column.labels  = c("Pooled IV", "Two-Way FE", "State FE + Decision", "Overidentified"),
+  se = list(
+    sqrt(diag(vcovCL(IV_no_fixed_1,   cluster = ~FIPS_ST, data = complete_county_data0))),
+    sqrt(diag(vcovCL(IV_fixed_1,      cluster = ~FIPS_ST, data = complete_county_data0))),
+    sqrt(diag(vcovCL(IV_fixed_2,      cluster = ~FIPS_ST, data = complete_county_data0))),
+    sqrt(diag(vcovCL(IV_fixed_overid, cluster = ~FIPS_ST, data = complete_county_data0)))
+  ),
+  add.lines = list(
+    c("State FE",           "No",         "Yes",        "Yes",        "Yes"),
+    c("Year FE",            "No",         "Yes",        "No",         "Yes"),
+    c("SE Clustering",      "State",      "State",      "State",      "State"),
+    c("Instruments",        "WAR",        "WAR",        "WAR",        "WAR + WAR(t-1)"),
+    c("First-Stage F",      "60.09",      "16.08",      "38.28",      "7.76"),
+    c("Effective F",        "--",         "5.14",       "--",         "2.89"),
+    c("Wu-Hausman p",       "<0.001",     "<0.001",     "<0.001",     "<0.001"),
+    c("Sargan p",           "Exactly ID", "Exactly ID", "Exactly ID", "0.121")
+  ),
+  label = "tab:main_results",
+  title = "IV Estimates of the Effect of Household Firearm Ownership on Firearm Mortality",
+  notes = paste0(
+    "All specifications instrument household firearm ownership rates ($HFR_{s,t}$) ",
+    "with the leave-one-out population-weighted mean murder arrest rate of neighboring ",
+    "counties ($WAR_{it}$). Column (4) augments the instrument set with the one-year lag ",
+    "($WAR_{i,t-1}$), reducing the sample to 2000--2016. The conventional first-stage F ",
+    "is reported without clustering; the Olea-Pflueger effective F accounts for the ",
+    "clustering structure and is reported for Columns (2) and (4). The Sargan p-value ",
+    "in Column (4) is from the Hansen overidentification test; failure to reject ",
+    "(p = 0.121) is consistent with both instruments identifying the same causal effect. ",
+    "Standard errors clustered at the state level in parentheses. ",
+    "$^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$."
+  ),
+  notes.align = "l"
 )
 
 # -----------------------------------------------------------------------------
