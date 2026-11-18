@@ -866,12 +866,14 @@ stargazer(
     sqrt(diag(vcovCL(IV_fixed_2,    cluster = ~FIPS_ST, data = complete_county_data0)))
   ),
   add.lines = list(
-    c("State FE",           "No",         "Yes",        "Yes"),
-    c("Year FE",            "No",         "Yes",        "No"),
-    c("SE Clustering",      "State",      "State",      "State"),
-    c("First-Stage F",      "60.09",      "16.08",      "38.28"),
-    c("Wu-Hausman p-value", "<0.001",     "<0.001",     "<0.001"),
-    c("Sargan",             "Exactly ID", "Exactly ID", "Exactly ID")
+    c("State FE",      "No",         "Yes",        "Yes"),
+    c("Year FE",       "No",         "Yes",        "No"),
+    c("SE Clustering", "State",      "State",      "State"),
+    c("Instrument",    "WAR",        "WAR",        "WAR"),
+    c("First-Stage F", "60.09",      "16.08",      "38.28"),
+    c("Effective F",   "--",         "5.14",       "--"),
+    c("Wu-Hausman p",  "<0.001",     "<0.001",     "<0.001"),
+    c("Sargan",        "Exactly ID", "Exactly ID", "Exactly ID")
   )
 )
 
@@ -913,13 +915,38 @@ stargazer(
     sqrt(diag(vcovCL(IV_fixed_2,    cluster = ~FIPS_ST, data = complete_county_data0)))
   ),
   add.lines = list(
-    c("State FE",           "No",         "Yes",        "Yes"),
-    c("Year FE",            "No",         "Yes",        "No"),
-    c("SE Clustering",      "State",      "State",      "State"),
-    c("First-Stage F",      "60.09",      "16.08",      "38.28"),
-    c("Wu-Hausman p-value", "<0.001",     "<0.001",     "<0.001"),
-    c("Sargan",             "Exactly ID", "Exactly ID", "Exactly ID")
+    c("State FE",      "No",         "Yes",        "Yes"),
+    c("Year FE",       "No",         "Yes",        "No"),
+    c("SE Clustering", "State",      "State",      "State"),
+    c("Instrument",    "$WAR_{it}$", "$WAR_{it}$", "$WAR_{it}$"),
+    c("First-Stage F", "60.09",      "16.08",      "38.28"),
+    c("Effective F",   "---",        "5.14",       "---"),
+    c("Wu-Hausman p",  "<0.001",     "<0.001",     "<0.001"),
+    c("Sargan",        "Exactly ID", "Exactly ID", "Exactly ID")
   ),
+  notes = paste0(
+    "All specifications instrument household firearm ownership rates ($HFR_{s,t}$) ",
+    "with the leave-one-out population-weighted mean murder arrest rate of neighboring ",
+    "counties ($WAR_{it}$). Column (1) is pooled IV with no fixed effects. Column (2) ",
+    "adds state and year fixed effects and represents the preferred specification. ",
+    "Column (3) replaces year fixed effects with $\\mathbbm{1}\\{decision_{i,t}\\}$, ",
+    "equal to one for observations after 2010. $\\mathbbm{1}\\{universal_{s,t}\\}$ and ",
+    "$\\mathbbm{1}\\{permit_{s,t}\\}$ indicate states with universal background check ",
+    "and concealed carry permit requirements, respectively. The conventional ",
+    "first-stage F is reported without clustering; the Olea-Pflueger effective F ",
+    "accounts for the clustering structure and is reported for Column (2). The ",
+    "Wu-Hausman test rejects the null of exogeneity in all specifications. The model ",
+    "is exactly identified in all specifications and the Sargan overidentification ",
+    "test is not applicable. Standard errors clustered at the state level in ",
+    "parentheses. $^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$."
+  ),
+  covariate.labels = c(
+    "HFR",
+    "$\\mathbbm{1}\\{universal\\}$",
+    "$\\mathbbm{1}\\{permit\\}$",
+    "$\\mathbbm{1}\\{decision\\}$"
+  ),
+  notes.align = "l",
   label = "tab:main_results",
   title = "IV Estimates of the Effect of Household Firearm Ownership on Firearm Mortality"
 )
@@ -1106,6 +1133,22 @@ iv_robust_fixed1_interior <- coeftest(
 iv_robust_fixed1_interior
 
 # -----------------------------------------------------------------------------
+# Reduced form: regress the firearm death rate directly on the instrument and
+# all controls, bypassing the first stage. Reported as Column (1) of the
+# robustness table.
+RF_fixed <- lm(
+  d_rate ~ c_WAR + universl + permit + factor(FIPS_ST) + factor(Year),
+  data = complete_county_data0
+)
+
+iv_robust_rf <- coeftest(
+  RF_fixed,
+  vcov. = vcovCL(RF_fixed, cluster = ~FIPS_ST, data = complete_county_data0)
+)
+
+iv_robust_rf
+
+# -----------------------------------------------------------------------------
 # Robustness Table
 # -----------------------------------------------------------------------------
 # LaTeX table for robustness checks
@@ -1123,43 +1166,77 @@ se_interior <- sqrt(diag(vcovCL(
   IV_fixed_1_interior, cluster = ~FIPS_ST, data = complete_county_data0_interior
 )))
 
+se_rf <- sqrt(diag(vcovCL(
+  RF_fixed, cluster = ~FIPS_ST, data = complete_county_data0
+)))
+
+se_overid <- sqrt(diag(vcovCL(
+  IV_fixed_overid, cluster = ~FIPS_ST, data = complete_county_data0
+)))
+
+# stargazer deparses the expression passed to it to build table names; an
+# inline list() of five model objects exceeds deparse()'s 60-character cutoff,
+# which returns a character vector and errors under R >= 4.2. Naming the list
+# first keeps the deparsed expression short.
+rob_models <- list(
+  RF_fixed, IV_fixed_1, IV_fixed_1_instate, IV_fixed_1_interior, IV_fixed_overid
+)
+
 stargazer(
-  list(IV_fixed_1, IV_fixed_1_instate, IV_fixed_1_interior),
+  rob_models,
   type           = "latex",
   keep.stat      = "n",
   omit           = c("Constant", "factor"),
   dep.var.labels = "Firearm Death Rate",
   column.labels  = c(
+    "Reduced Form",
     "Main Specification",
     "Within-State Instrument",
-    "Interior Counties"
+    "Interior Counties",
+    "Overidentified"
   ),
-  se = list(se_main, se_instate, se_interior),
+  se = list(se_rf, se_main, se_instate, se_interior, se_overid),
   add.lines = list(
-    c("State FE",             "Yes",        "Yes",        "Yes"),
-    c("Year FE",              "Yes",        "Yes",        "Yes"),
-    c("SE Clustering",        "State",      "State",      "State"),
-    c("Instrument",           "$WAR_{it}$", "$WAR^{in}_{it}$", "$WAR_{it}$"),
-    c("Sample",               "Full",       "Full",       "Interior"),
-    c("First-Stage F",        "16.08",      "16.81",      "16.29"),
-    c("Wu-Hausman p-value",   "<0.001",     "<0.001",     "0.002"),
-    c("Sargan",               "Exactly ID", "Exactly ID", "Exactly ID")
+    c("State FE",      "Yes",   "Yes",        "Yes",             "Yes",        "Yes"),
+    c("Year FE",       "Yes",   "Yes",        "Yes",             "Yes",        "Yes"),
+    c("SE Clustering", "State", "State",      "State",           "State",      "State"),
+    c("Instrument",    "---",   "$WAR_{it}$", "$WAR^{in}_{it}$", "$WAR_{it}$", "$WAR_{it} + WAR_{i,t-1}$"),
+    c("Sample",        "Full",  "Full",       "Full",            "Interior",   "Full"),
+    c("First-Stage F", "---",   "16.08",      "16.81",           "16.29",      "7.76"),
+    c("Effective F",   "---",   "5.14",       "---",             "---",        "2.89"),
+    c("Wu-Hausman p",  "---",   "<0.001",     "<0.001",          "0.002",      "<0.001"),
+    c("Sargan p",      "---",   "Exactly ID", "Exactly ID",      "Exactly ID", "0.121")
   ),
-  keep      = c("HFR", "universl", "permit"),
+  keep      = c("c_WAR", "HFR", "universl", "permit"),
+  order     = c("c_WAR", "HFR", "universl", "permit"),
+  covariate.labels = c(
+    "$WAR_{it}$",
+    "HFR",
+    "$\\mathbbm{1}\\{universal\\}$",
+    "$\\mathbbm{1}\\{permit\\}$"
+  ),
   label     = "tab:robustness",
   title     = paste0(
     "Robustness Checks: IV Estimates of the Effect of Household ",
     "Firearm Ownership on Firearm Mortality"
   ),
   notes = paste0(
-    "All specifications instrument household firearm ownership rates ",
-    "($HFR_{s,t}$) and include state and year fixed effects. ",
-    "Column (1) reproduces the preferred two-way fixed effects specification. ",
-    "Column (2) restricts the instrument to within-state neighbors only, ",
-    "excluding cross-state neighbor counties from the construction of $WAR_{it}$. ",
-    "Column (3) excludes all counties with at least one cross-state neighbor ",
-    "from the estimation sample. ",
-    "Standard errors clustered at the state level in parentheses. ",
+    "Column (1) reports the reduced-form specification, which regresses the firearm ",
+    "death rate directly on $WAR_{it}$ and all controls, bypassing the first stage. ",
+    "Columns (2)--(5) report IV specifications instrumenting $HFR_{s,t}$ with the ",
+    "leave-one-out population-weighted mean murder arrest rate of neighboring counties ",
+    "($WAR_{it}$). All specifications include state and year fixed effects. Column (2) ",
+    "reproduces the preferred two-way fixed effects specification. Column (3) restricts ",
+    "the instrument to within-state neighbors only, excluding cross-state neighbor ",
+    "counties from the construction of $WAR_{it}$. Column (4) excludes all counties ",
+    "with at least one cross-state neighbor from the estimation sample. Column (5) ",
+    "augments the instrument set with the one-year lag $WAR_{i,t-1}$, reducing the ",
+    "sample to 2000--2016; the Sargan p-value is from the Hansen overidentification ",
+    "test and failure to reject (p = 0.121) is consistent with both instruments ",
+    "identifying the same causal effect through the ownership channel. The conventional ",
+    "first-stage F is reported without clustering; the Olea-Pflueger effective F ",
+    "accounts for the clustering structure and is reported where applicable. Standard ",
+    "errors clustered at the state level in parentheses. ",
     "$^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$."
   ),
   notes.align = "l"
