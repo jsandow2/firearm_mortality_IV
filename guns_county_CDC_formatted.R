@@ -803,6 +803,24 @@ IV_fixed_overid <- ivreg(
 )
 summary(IV_fixed_overid, diagnostics = TRUE)
 
+# The Hansen test can only detect a violation that differs across the two
+# instruments, so its power depends on how much independent variation the lag
+# retains once the first stage's fixed effects are absorbed. Reported in the
+# text alongside the Sargan result.
+overid_vars <- c("d_rate", "HFR", "universl", "permit", "FIPS_ST", "Year",
+                 "c_WAR", "c_WAR_lag")
+overid_sample <- complete_county_data0[
+  complete.cases(complete_county_data0[, overid_vars]), ]
+
+war_resid     <- resid(lm(c_WAR     ~ universl + permit + factor(FIPS_ST) + factor(Year),
+                          data = overid_sample))
+war_lag_resid <- resid(lm(c_WAR_lag ~ universl + permit + factor(FIPS_ST) + factor(Year),
+                          data = overid_sample))
+
+cat("Instrument correlation, overidentified sample (n =", nrow(overid_sample), "):\n")
+cat("  raw:                     ", round(cor(overid_sample$c_WAR, overid_sample$c_WAR_lag), 4), "\n")
+cat("  after state and year FE: ", round(cor(war_resid, war_lag_resid), 4), "\n")
+
 # Olea-Pflueger effective F for overidentified spec
 eff_F_overid <- ivDiag(
   data     = complete_county_data0,
