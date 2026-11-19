@@ -667,6 +667,9 @@ Z <- complete_county_data0_cc$c_WAR
 X <- model.matrix(~ universl + permit + factor(FIPS_ST) + factor(Year),
                   data = complete_county_data0_cc)[, -1]
 
+# ivmodel does not support clustering: its Anderson-Rubin test assumes i.i.d.
+# errors and is retained here only as the unclustered comparison. The figures
+# reported in the text come from the ivDiag call below, which clusters on state.
 iv_model <- ivmodel(Y = Y, D = D, Z = Z, X = X)
 summary(iv_model)
 
@@ -685,6 +688,15 @@ eff_F <- ivDiag(
 
 cat("Olea-Pflueger effective F (exactly-identified):\n")
 print(eff_F$F_stat)
+
+# Cluster-robust Anderson-Rubin. These are the figures reported in the text.
+# ci is on the coefficient scale; the paper states the effect as deaths per
+# 100,000 per percentage point of HFR, which is the coefficient times 1,000.
+cat("Anderson-Rubin, clustered on state:\n")
+print(eff_F$AR$Fstat)
+cat("  95% AR interval, coefficient scale:    ", eff_F$AR$ci.print, "\n")
+cat("  95% AR interval, per 100,000 per p.p.: ",
+    paste0("[", paste(round(eff_F$AR$ci * 1000, 2), collapse = ", "), "]"), "\n")
 
 # -----------------------------------------------------------------------------
 # 19. PLM panel IV regressions (robustness checks)

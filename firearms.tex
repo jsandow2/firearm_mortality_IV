@@ -89,33 +89,22 @@
 % =============================================================================
 
 \begin{abstract}
-
-This study estimates the causal effect of household firearm ownership rates 
-on total firearm mortality using a county-level panel dataset spanning 
-1999--2016. To address endogeneity and reverse causality, household firearm 
-ownership rates are instrumented with the population-weighted leave-one-out 
-mean murder arrest rate of neighboring counties. The preferred two-way fixed 
-effects specification indicates that a one percentage point increase in the 
-household firearm ownership rate causally increases the firearm death rate by 
-approximately 0.00653 deaths per capita --- equivalent to 6.53 additional 
-firearm deaths per 100,000 population per percentage point increase in the ownership rate, a magnitude that should be read against the sample composition described below. The Anderson-Rubin test rejects the null hypothesis of no 
-treatment effect ($F = 56.68$, $p < 0.001$), with a weak-instrument-robust 
-95\% confidence interval of $[3.98, 13.09]$ additional deaths per 100,000 
-per percentage point increase in the ownership rate. Unlike much of the 
-existing literature, which examines firearm ownership and homicide or suicide 
-in isolation, this study examines total firearm mortality as the primary 
-outcome, representing among the few IV-based estimates of the causal effect 
-of ownership on total firearm mortality at the county level. CDC suppression 
-of county-year observations with nine or fewer deaths disproportionately 
-excludes small rural counties with high ownership rates, generating a 
-downward-biased estimation sample mean of 7.64 per 100,000 relative to the 
-true national unsuppressed mean of 11.77 per 100,000; the implications of 
-this for the magnitude interpretation are discussed in detail. Evidence on 
-universal background check and concealed carry permit requirements is 
-statistically inconclusive once standard errors are clustered at the state 
-level, consistent with limited within-state policy variation over the sample 
-period.
-
+This study estimates the causal effect of household firearm ownership on total 
+firearm mortality using a county-level panel spanning 1999--2016. Household 
+firearm ownership rates are instrumented with the population-weighted 
+leave-one-out mean murder arrest rate of neighboring counties, addressing 
+endogeneity and reverse causality. The preferred two-way fixed effects 
+specification implies that a one percentage point increase in the ownership 
+rate raises firearm mortality by 6.53 deaths per 100,000, and 
+weak-instrument-robust inference rejects no effect with a confidence interval 
+of $[1.80, 52.90]$. Unlike most of the literature, which treats homicide and 
+suicide separately, the outcome here is total firearm mortality. The magnitude 
+should be read with care: CDC suppression of county-years with nine or fewer 
+deaths excludes small rural counties with high ownership rates, leaving an 
+estimation sample whose mean death rate is roughly a third below the true 
+national rate. Evidence on universal background check and concealed carry 
+permit requirements is inconclusive once standard errors are clustered at the 
+state level.
 \end{abstract}
 
 % =============================================================================
@@ -174,7 +163,7 @@ period.
 
 Mass shooting events are often invoked in shorthand: Columbine, Sandy Hook, Uvalde, Pulse, Aurora, Parkland, Las Vegas—forming a macabre litany that blurs with other national tragedies, including Pearl Harbor, Oklahoma City, and September 11. Responses to the assertion that ``guns make us safe, and therefore more guns make us safer'' may reveal more about lived experiences than about the claim's empirical validity. For those who live in communities where law enforcement or emergency services reliably arrive within three to four minutes, the necessity of firearm ownership may seem unwarranted. Conversely, in communities where emergency response times range from four to eighteen minutes—whether due to geography, policy, or resource allocation—the benefits and risks of firearm ownership may be evaluated differently. To adjudicate these competing intuitions, credible causal evidence is required. This study provides such evidence.
 
-This paper estimates the causal effect of firearm prevalence on total firearm mortality. Using a county-level panel dataset spanning 1999--2016, the analysis employs an instrumental variable strategy to address endogeneity and reverse causality in the relationship between firearm ownership and firearm mortality. Unlike much of the existing literature, which disaggregates firearm deaths into suicides, homicides, or accidental incidents to address outcome heterogeneity, this study examines total firearm mortality as the primary outcome. The preferred two-way fixed effects specification indicates that a one percentage point increase in the household firearm ownership rate causally increases the firearm death rate by approximately 0.00653 deaths per capita --- equivalent to 6.53 additional firearm deaths per 100,000 population per percentage point increase in HFR. As documented in Section~\ref{sec:data}, the estimation sample mean of 7.64 firearm deaths per 100,000 understates the true national unsuppressed mean of 11.77 per 100,000 due to CDC suppression of small rural counties; the implications of this for the magnitude interpretation are discussed in detail in Section~\ref{sec:Supp}. These findings contribute to a literature that has largely examined firearm ownership and homicide or suicide in isolation, and represent among the few IV-based estimates of the causal effect of ownership on total firearm mortality at the county level.
+This paper estimates the causal effect of firearm prevalence on total firearm mortality. Using a county-level panel dataset spanning 1999--2016, the analysis employs an instrumental variable strategy to address endogeneity and reverse causality in the relationship between firearm ownership and firearm mortality. Unlike much of the existing literature, which disaggregates firearm deaths into suicides, homicides, or accidental incidents to address outcome heterogeneity, this study examines total firearm mortality as the primary outcome. The preferred two-way fixed effects specification indicates that a one percentage point increase in the household firearm ownership rate causally increases the firearm death rate by approximately 0.00653 deaths per capita --- equivalent to 6.53 additional firearm deaths per 100,000 population per percentage point increase in HFR; Appendix~\ref{sec:units} gives the conversion. As documented in Section~\ref{sec:data}, the estimation sample mean of 7.64 firearm deaths per 100,000 understates the true national unsuppressed mean of 11.77 per 100,000 due to CDC suppression of small rural counties; the implications of this for the magnitude interpretation are discussed in detail in Section~\ref{sec:Supp}. These findings contribute to a literature that has largely examined firearm ownership and homicide or suicide in isolation, and represent among the few IV-based estimates of the causal effect of ownership on total firearm mortality at the county level.
 
 
 % -----------------------------------------------------------------------------
@@ -245,12 +234,7 @@ A central empirical challenge in this literature is the absence of reliable admi
 
 The most comprehensive estimates of household firearm ownership are provided by the RAND Corporation, which compiled 22 distinct measures of firearm ownership spanning 1980--2016. These measures incorporate both self-reported survey data and structural proxies, including permit issuance and subscriptions to firearms-related publications, to estimate the proportion of households owning firearms at the state level. Among the self-reported inputs are three Behavioral Risk Factor Surveillance System (BRFSS) waves that included firearm ownership questions (2001, 2002, and 2004). The RAND estimates are constructed at the state level, and no comparable, reliable county-level ownership measures currently exist \citep{TL-354-LJAF}. Accordingly, each county is assigned the household firearm ownership rate corresponding to its state. The implications of this assignment for measurement error and identification are discussed below.
 
-Although firearm ownership rates likely vary between rural and urban counties, the use of state-level ownership estimates for county-level analysis can be justified both algebraically and empirically. Suppression in the mortality data disproportionately affects sparsely populated counties. For example, Vermont — the most rural state, with 64.9\% of its population classified as rural — has approximately 85\% of its county-year observations suppressed. In contrast, states with the largest rural populations in absolute terms (e.g., Texas, North Carolina, Pennsylvania, and Ohio) have substantially lower rural population shares: 15\% in Texas, 32\% in North Carolina, and approximately 23\% in Pennsylvania and Ohio. Consider North Carolina as an illustrative case. Over the period 1999--2016, the mean household firearm ownership rate (HFR) is 37\%. Let $r$ denote the rural ownership rate, $\mu$ the urban ownership rate, and $\alpha = 0.32$ the rural population share. The state mean satisfies
-\begin{align*}
-    0.37 &= \alpha r + (1-\alpha)\mu
-\end{align*}
-Even under an extreme upper bound in which $r=1$, the implied urban ownership rate is 
-$\mu=0.0641$. This bound illustrates that the state-level mean places substantial weight on the urban ownership rate. Because the estimating sample overrepresents urban counties due to suppression, the state-level ownership measure is likely closer to the ownership rates prevailing in the observed (primarily urban) counties than to those in sparsely populated rural areas. To the extent that within-state heterogeneity remains, the resulting measurement error in HFR is concentrated in the rural counties that are disproportionately suppressed from the estimation sample. Within the observed sample — which overrepresents urban counties — the state-level ownership measure is likely a reasonable approximation of prevailing ownership rates. However, as discussed in Section~\ref{sec:Supp}, the suppression mechanism that justifies this approximation also restricts the identifying variation available to the IV estimator, and the two considerations should be evaluated together rather than independently.
+Although firearm ownership rates likely vary between rural and urban counties, the use of state-level ownership estimates for county-level analysis can be justified both algebraically and empirically. Suppression in the mortality data disproportionately affects sparsely populated counties. For example, Vermont — the most rural state, with 64.9\% of its population classified as rural — has approximately 85\% of its county-year observations suppressed. In contrast, states with the largest rural populations in absolute terms (e.g., Texas, North Carolina, Pennsylvania, and Ohio) have substantially lower rural population shares: 15\% in Texas, 32\% in North Carolina, and approximately 23\% in Pennsylvania and Ohio. A bound for North Carolina, set out in Appendix~\ref{sec:hfr-bound}, shows that the state-level mean places substantial weight on the urban ownership rate. Because the estimating sample overrepresents urban counties due to suppression, the state-level ownership measure is likely closer to the ownership rates prevailing in the observed (primarily urban) counties than to those in sparsely populated rural areas. To the extent that within-state heterogeneity remains, the resulting measurement error in HFR is concentrated in the rural counties that are disproportionately suppressed from the estimation sample. Within the observed sample — which overrepresents urban counties — the state-level ownership measure is likely a reasonable approximation of prevailing ownership rates. However, as discussed in Section~\ref{sec:Supp}, the suppression mechanism that justifies this approximation also restricts the identifying variation available to the IV estimator, and the two considerations should be evaluated together rather than independently.
 %To the extent that within-state heterogeneity remains, the resulting measurement error is unlikely to be systematically correlated with the instrument and would therefore be expected to attenuate estimated effects.
 
 Household firearm ownership rates exhibit a general downward trend from 1999 to 2010 (Figure \ref{fig:HFR}), continuing a broader decline that began in the 1980s. In 2011, ownership rates increased modestly, followed by a more pronounced rise in 2012, from approximately 0.39 to 0.41. This increase was followed by three consecutive years of decline, reaching approximately 0.37, before rising again to 0.40 in 2016. These fluctuations coincide with similar movements in the national firearm mortality rate during the same period.
@@ -278,24 +262,13 @@ The first dimension of suppression bias operates on the outcome mean. The estima
 
 Table~\ref{tab:suppression_by_state} documents suppression rates across the ten most affected states. Vermont suppresses 85.3 percent of its county-year observations, and West Virginia, Mississippi, Arkansas, and Wyoming each suppress more than 74 percent. Critically, several of these states — West Virginia and Wyoming in particular — rank among the highest-ownership states in the sample. The counties being suppressed in these states are not low-mortality counties. They are small rural counties where firearm ownership rates are high and firearm suicide rates are meaningful, but where annual death counts fall at or below the suppression threshold due to small population denominators rather than low per capita risk.
 
-Table~\ref{tab:suppression_high_ownership} makes this argument concrete for the five highest-ownership states — Montana, Wyoming, Alaska, West Virginia, and Idaho — which have mean household firearm ownership rates ranging from 55.0 to 63.4 percent over the estimation period. Across these five states, 7,523 firearm deaths — 51.2 percent of the true total of 14,707 — are invisible to the county-level estimation sample due to suppression. Wyoming loses 66.8 percent of its true deaths, West Virginia 59.8 percent, and Montana 49.6 percent. Each of these states has a true firearm death rate substantially above the national unsuppressed mean of 11.77 per 100,000: Alaska at 18.4, Wyoming at 16.1, Montana at 15.9, West Virginia at 14.4, and Idaho at 12.5. The suppressed counties in these states are therefore not low-mortality outliers — they are high-per-capita-mortality rural counties whose exclusion from the estimation sample understates the baseline mortality burden and distorts the identifying variation available to the IV estimator.
+Table~\ref{tab:suppression_high_ownership} makes this argument concrete for the five highest-ownership states — Montana, Wyoming, Alaska, West Virginia, and Idaho — which have mean household firearm ownership rates ranging from 55.0 to 63.4 percent over the estimation period. Two of these, Idaho and Montana, are the states shown in Figure~\ref{fig:sh_homicide_state}, where firearm suicides exceed firearm homicides by a factor of ten or more and firearm homicides are frequently suppressed outright. Across these five states, 7,523 firearm deaths — 51.2 percent of the true total of 14,707 — are invisible to the county-level estimation sample due to suppression. Wyoming loses 66.8 percent of its true deaths, West Virginia 59.8 percent, and Montana 49.6 percent. Each of these states has a true firearm death rate substantially above the national unsuppressed mean of 11.77 per 100,000: Alaska at 18.4, Wyoming at 16.1, Montana at 15.9, West Virginia at 14.4, and Idaho at 12.5. The suppressed counties in these states are therefore not low-mortality outliers — they are high-per-capita-mortality rural counties whose exclusion from the estimation sample understates the baseline mortality burden and distorts the identifying variation available to the IV estimator.
 
 The second dimension of suppression bias operates on the point estimate through a mechanism that runs in the opposite direction. The estimation sample overrepresents large urban counties, which tend to have lower household firearm ownership rates — because state-level HFR is pulled toward urban ownership rates in the more populous counties that dominate the estimation sample — and higher absolute death counts that cross the suppression threshold consistently. The instrument $WAR_{it}$ has greater power in urban counties, where neighboring county murder arrest rates are higher and more precisely measured. The IV estimator therefore identifies the effect of HFR on mortality primarily from variation among low-HFR urban counties, extrapolating that estimate to a population that includes high-HFR rural counties whose mortality experience is largely unobserved. To the extent that the ownership-mortality relationship is nonlinear or heterogeneous across the urban-rural divide, this extrapolation inflates the point estimate relative to what would be obtained from a complete sample.
 
 These two biases are related. The attenuation pattern documented in the robustness checks of Section~\ref{sec:IV-R} — in which the HFR coefficient declines from 0.00653 to 0.00434 under the within-state instrument and further to 0.00288 under the interior county restriction — reflects progressive removal of the cross-state urban variation that dominates the estimation sample due to suppression. In a complete sample that included the currently suppressed rural counties, within-state and geographically localized identifying variation would constitute a larger share of total variation, and the robustness restrictions would remove a smaller fraction of it. The attenuation observed in the robustness checks is therefore partly an artifact of the suppression-driven sample composition rather than solely a reflection of spatial autocorrelation bias in the instrument. These considerations do not overturn the directional finding — the sign of the HFR coefficient is positive and stable across all specifications once fixed effects are introduced, the Wu-Hausman test consistently rejects exogeneity, and the Anderson-Rubin test rejects the null of no treatment effect — but they do counsel caution in interpreting the magnitude of the point estimate as a precise causal effect applicable to the full population of counties.
 
 % Figures referenced in data section:
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{percent_covered.pdf}
-    \caption{Due to suppression in the CDC WONDER data, the share of the 
-    U.S. population represented in the estimating sample varies by year. 
-    The reported values represent upper bounds on annual population 
-    coverage. The upward trend is consistent with increasing population 
-    concentration in urban counties over time.}
-    \label{fig:pop_cov}
-\end{figure}
 
 \begin{figure}[htbp]
     \centering
@@ -322,21 +295,220 @@ These two biases are related. The attenuation pattern documented in the robustne
     \label{fig:death_rate}
 \end{figure}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{unsuppressed_county_year_observations.pdf}
-    \caption{Number of unsuppressed county-year observations by year, 
-    1999--2020. A county-year observation is unsuppressed when the recorded 
-    firearm death count exceeds nine, the CDC WONDER confidentiality 
-    threshold. The dashed vertical line marks the \textit{McDonald v.\ City 
-    of Chicago} decision (2010), after which the number of unsuppressed 
-    observations rises steadily, consistent with increasing firearm mortality 
-    pulling previously suppressed county-year cells above the suppression 
-    threshold. The dotted vertical line marks the end of the estimation 
-    period (2016), determined by the availability of RAND household firearm 
-    ownership estimates.}
-    \label{fig:unsuppressed}
-\end{figure}
+% -----------------------------------------------------------------------------
+\section{Identification}
+\label{sec:id}
+% -----------------------------------------------------------------------------
+
+Empirical analyses typically begin with a formal specification of the econometric model. However, because the baseline specification is straightforward, the discussion begins with the identification strategy and the construction of the instrumental variable. The need for an instrumental variable arises from concerns about reverse causality. For example, if firearm violence increases in a neighborhood, residents may respond by purchasing firearms for protection, generating endogeneity in observed ownership rates. An ideal instrument would affect household firearm ownership while having no direct effect on firearm mortality. In studies focused narrowly on gun crime, researchers often use firearm suicide rates as an instrument for firearm ownership. However, because the present analysis examines total firearm mortality, including suicides, this approach would violate the exclusion restriction and reintroduce endogeneity concerns. A substantial literature documents a correlation between firearm ownership rates and crime rates \citep{cook2006social, cook1979effect, duggan2001more, hemenway2000firearm, kaplan1998firearm, miller2002rates, miller2007state, sorenson2001handgun, koenig2016dynamics}. \citet{depew2019decision} provide causal evidence that local homicide rates influence individual decisions to apply for concealed carry permits, establishing a link between neighborhood crime and firearm-related behavior. Building on this relationship, \citet{johnson2023armed} construct a leave-one-out instrument using neighboring county murder rates to identify the effect of concealed carry permit rates on firearm-related injuries. The present study adopts a similar strategy but uses murder arrest rates rather than murder rates, as arrest data are available at the county level through the UCR system, and instruments for household firearm ownership rates rather than concealed carry permit rates, thereby broadening both the outcome of interest and the geographic scope of identification.
+
+A natural concern is that the proposed instrument may violate the exclusion restriction. For example, an individual residing in a suburban county may commit a homicide in a neighboring urban county but be arrested in their county of residence. While such cross-county incidents may occur, several conditions must hold for this mechanism to generate systematic bias. First, the offender must reside in a county contiguous to the one in which the crime occurred. Second, such cross-county arrest patterns would need to be sufficiently prevalent and geographically systematic to bias the instrument. Empirical evidence suggests that most arrests occur within the offender's county of residence, indicating that criminal activity and arrest outcomes are predominantly local phenomena \citep{johnson2023armed}.
+
+The exclusion restriction could also fail if criminal activity systematically occurs across county borders, such that offenses are committed in one county but arrests consistently occur in another. However, available evidence suggests that most violent crime is geographically localized rather than systematically cross-jurisdictional. While organized criminal networks may operate across jurisdictions, such activity would need to be sufficiently widespread and systematically aligned with county borders to generate meaningful bias in the instrument. Empirical evidence indicates that arrests overwhelmingly occur within the county in which the offense was committed, limiting the scope for systematic cross-county misalignment \citep{johnson2023armed}. Accordingly, the instrument is constructed as the population-weighted leave-one-out mean murder arrest rate among counties neighboring county $i$, as defined formally below.
+    \begin{align}
+        WAR_{it}=\sum_{j\neq i}^{n}p_{jt}ar_{jt}
+    \end{align}
+
+\noindent where $ar_{jt}$ denotes the murder arrest rate in county $j$ at time $t$, and $p_{jt}$ denotes the population weight of county $j$ among all counties adjacent to $i$.
+
+%Returning to Figure \ref{fig:death_rate}, the time series warrants closer examination. Through 2010, the firearm death rate per 100,000 remained relatively stable at approximately 11. Beginning in 2010, the firearm death rate began a sustained upward trend that continued through 2020. After peaking in 2020, the firearm death rate declined, though not to pre-2010 levels.
+
+%\begin{quote}
+%    Private citizens have the right under the Second Amendment to possess an ordinary type of weapon and use it for lawful, historically established situations such as self-defense in a home, even when there is no relationship to a local militia.%
+%    \footnote{\textit{District of Columbia v. Heller}, 554 U.S. 570 (2008).}
+%\end{quote}
+%The decision recognized an individual right to possess firearms for self-defense, though its immediate application was limited to federal jurisdictions. It was not until 2010 that the Supreme Court found:
+%\begin{quote}
+%    The Due Process Clause of the Fourteenth Amendment extends the Second Amendment's right to keep and bear arms to the states, at least for traditional, lawful purposes such as self-defense.%
+%    \footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).}
+%\end{quote}
+%The Court's decision in McDonald incorporated the Second Amendment against the states, thereby invalidating certain state-level firearm restrictions. Figure \ref{fig:HFR} indicates increases in estimated household firearm ownership in 2011 and 2012, coinciding with the initial rise in firearm mortality shown in Figure \ref{fig:death_rate}. However, attributing these changes to the Court's decisions would require ruling out alternative explanations for contemporaneous increases in firearm ownership and mortality. Such a causal interpretation is further complicated by evidence that suicides account for the majority of the increase in firearm mortality during 2011--2012 (Figure \ref{fig:self_harm}). The period also coincides with broader social changes, including the rapid expansion of social media platforms. Prior research has linked increased social media use to elevated suicide risk, particularly among adolescent females \citep{jaycox2024social, massing2020cybervictimization}. Figure \ref{fig:sh_gender} shows a modest increase in firearm suicides among individuals assigned female at birth beginning around 2010. The corresponding increase among individuals assigned male at birth is substantially larger.
+
+In the panel setting, inference must account for serial correlation within states and common shocks over time. The choice of functional form also matters: a log specification is often convenient for rate outcomes, but it is undefined when the outcome is zero. In this application, some county-year observations record zero firearm deaths, implying a zero firearm death rate. These zeros reflect valid realizations of the outcome and should be retained in the estimating sample. Accordingly, the baseline specification is estimated in levels rather than log--log form.
+
+\begin{align}
+    d\_rate_{i,t} &= \beta_{1}HFR_{s,t} + \gamma_{s} + \delta_{t} +\mathbbm{1}\{universal_{s,t}\} + \mathbbm{1}\{permit_{s,t}\} +\epsilon_{i,t}
+\end{align}
+
+\noindent where $d\_rate_{i,t}$ denotes firearm deaths per capita in county $i$ at time $t$; $HFR_{s,t}$ denotes the state-level household firearm ownership rate; $s$ indexes states; and $t$ indexes years. $\mathbbm{1}\{universal_{s,t}\}$ and $\mathbbm{1}\{permit_{s,t}\}$ are indicator variables equal to one if state $s$ has universal background checks or permit requirements, respectively, in year $t$, and zero otherwise. Over the period 1999--2016 there is limited within-state variation in either indicator. During this period, states with universal background checks typically also required permits, and such policies were rarely repealed. Consequently, these indicators primarily capture cross-state differences rather than within-state policy changes. $\gamma_{s}$ and $\delta_{t}$ denote state and year fixed effects, respectively.
+
+\begin{align}
+    HFR_{s,t} = \varphi_{1}WAR_{i,t} + \gamma_{s} + \delta_{t} 
+    + \mathbbm{1}\{universal_{s,t}\} 
+    + \mathbbm{1}\{permit_{s,t}\} 
+    + \nu_{i,t}
+\end{align}
+
+\noindent $WAR_{i,t}$ denotes the population-weighted mean murder arrest rate among counties contiguous to county $i$, excluding county $i$ itself — the leave-one-out instrument. In the first-stage regression, the coefficient on $WAR_{i,t}$ is positive and statistically significant at the 5\% level with state-clustered standard errors ($\hat{\varphi}_{1} = 0.000182$; $se = 0.0000880$), consistent with the instrument shifting household firearm ownership rates in the expected direction. The first-stage F-statistic on the excluded instrument is 16.18 ($p < 0.001$) without clustering, exceeding the conventional threshold of 10 \citep{stock2002testing}. When standard errors are clustered at the state level, the Olea-Pflueger effective F-statistic \citep{olea2013robust} falls to 5.14, below the conventional threshold of 10 and raising concerns about instrument strength under clustered inference. To address this, the Anderson-Rubin test \citep{anderson1949estimation} -- which provides valid inference regardless of instrument strength -- is employed as the primary basis for inference. The Anderson-Rubin test rejects the null hypothesis of no treatment effect ($F = 9.07$, $p = 0.003$), with a weak-instrument-robust 95\% confidence interval of $[1.80, 52.90]$ additional deaths per 100,000 per percentage point increase in HFR, converted from the per capita units of the estimation, consistent with the 2SLS point estimate and supporting a positive causal effect of household firearm ownership on firearm mortality. Subsequent specifications include an additional indicator variable $\mathbbm{1}\{decision_{i,t}\}$, equal to one for observations after 2010 (and after 2008 for Washington, D.C.), to capture the structural break in firearm mortality coinciding with the \textit{McDonald v. City of Chicago} decision.\footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).} In these specifications, $\mathbbm{1}\{decision_{i,t}\}$ replaces the year fixed effects while state fixed effects are retained.
+
+Identifying a valid instrument for household firearm ownership is inherently difficult: any variable strongly correlated with ownership rates is likely also correlated with the structural disturbance $\epsilon_{i,t}$, violating the exclusion restriction. Hunting-related variables have appeared in prior work as proxies or instruments for firearm prevalence — including outdoor sports magazine subscriptions \citep{kovandzic2013estimating} and hunting license rates \citep{siegel2013relationship} — reflecting the strong correlation between hunting participation and household firearm ownership. These variables face two distinct objections. First, they may fail on relevance grounds: a safety-motivated purchaser is unlikely to hold a hunting license, meaning hunting-related measures do not capture the full range of ownership motivations relevant to the present context. Second, and more fundamentally, hunting participation is itself embedded in the broader cultural determinants of firearm prevalence and, potentially, firearm mortality — suggesting that hunting licenses may fail the exclusion restriction through channels independent of ownership rates.
+
+%Identifying a valid instrument for household firearm ownership is inherently difficult: any variable strongly correlated with ownership rates is likely also correlated with the structural disturbance $\epsilon_{i,t}$, violating the exclusion restriction. Hunting-related variables have appeared in prior work as proxies or instruments for firearm prevalence — including outdoor sports magazine subscriptions \citep{kovandzic2013estimating} and hunting license rates \citep{siegel2013relationship} — reflecting the strong correlation between hunting participation and household firearm ownership. For example, a safety-motivated purchaser is unlikely to hold a hunting license, illustrating that hunting-related variables may not capture the full range of ownership motivations relevant to the present context. More fundamentally, hunting participation is itself embedded in the broader cultural determinants of firearm prevalence and, potentially, firearm mortality — suggesting that hunting licenses may fail the exclusion restriction through channels independent of ownership rates.
+
+An alternative instrument employed in prior work is the homicide rate in neighboring counties \citep{johnson2023armed}. This approach performs reasonably well in urban areas but faces limitations in rural counties, where homicide counts are low and CDC suppression is prevalent, reducing the precision and coverage of the instrument. The leave-one-out murder arrest rate instrument faces the same limitation in rural counties; however, because CDC suppression disproportionately excludes rural county-year observations from the estimating sample, the practical impact of this constraint on first-stage precision is attenuated within the observed sample — though as documented in Section~\ref{sec:Supp}, the suppression that limits this concern simultaneously introduces sample composition bias that affects the interpretation of the estimates. Neighboring county suicide rates are similarly unsuitable as an instrument, as they would violate the exclusion restriction through the firearm substitution effect. Firearm ownership increases the likelihood of firearm suicide among suicidal individuals \citep{briggs2014firearms}, and recent evidence suggests ownership causally precedes increases in firearm suicide rates \citep{morral2024household} — meaning that any instrument correlated with suicide rates would also be correlated with the outcome through this channel. The number of taxidermists per capita has also been proposed as an instrument for firearm ownership, given that hunters frequently use taxidermy services — establishing a link between taxidermist prevalence and hunting activity, and by extension, firearm ownership.
+
+Although taxidermists represent an ancillary component of hunting culture, the channel through which taxidermist prevalence would affect firearm mortality, independent of ownership rates, is not apparent, suggesting the instrument may satisfy the exclusion restriction but raise concerns about relevance. A practical obstacle is that the North American Industry Classification System (NAICS) does not provide a dedicated code for taxidermists, instead classifying them under the broader category of independent artists, which encompasses actors, writers, and directors — making it difficult to isolate taxidermist counts from aggregate data. Whether this data limitation could be resolved through alternative sources, such as state-level business licensing records, remains an avenue for future research. Despite the instrument strength concerns discussed above, the leave-one-out neighboring county murder arrest rate remains attractive relative to available alternatives: it is derived from administrative data sources, its exclusion restriction is more plausibly defensible than hunting-related or suicide-based instruments, and the Anderson-Rubin test provides weak-instrument-robust evidence of a significant treatment effect.
+
+%--------------------------------------------------------------------------------------------------
+\subsection{Instrument Validity and Robustness}
+\label{sec:IV-R}
+%--------------------------------------------------------------------------------------------------
+
+The most serious threat to the exclusion restriction is spatial autocorrelation in crime. If regional economic conditions, demographic shifts, or unobserved cultural factors generate correlated crime trends across neighboring counties, the neighboring murder arrest rate may be correlated with unobserved local shocks in county $i$ that independently affect both firearm ownership and firearm mortality. This concern cannot be fully dismissed. Crime is not typically randomly distributed across space, and counties that border high-arrest counties may share labor markets, demographic characteristics, or social conditions that are themselves determinants of firearm mortality. Two features of the design partially address this concern. State fixed effects absorb persistent cross-county differences in crime culture, legal environment, and demographic composition that operate at the state level. Year fixed effects absorb common national shocks to crime and mortality that affect all counties simultaneously. The residual threat is time-varying, within-state spatial correlation in crime trends not captured by either set of fixed effects — a narrower concern than the raw spatial autocorrelation problem, though not a trivial one.
+
+A second potential violation of the exclusion restriction arises if residents of county $i$ directly observe $WAR_{it}$ and update their firearm ownership decisions through a channel that also affects mortality independent of ownership. This mechanism requires that individuals possess sufficiently precise knowledge of neighboring county murder arrest rates to incorporate them into ownership decisions. This condition is implausible in practice. Murder arrest rates are bureaucratic aggregates compiled from administrative records and reported, if at all, in statistical publications with limited public salience. Even residents with above-average awareness of local crime conditions are unlikely to distinguish the murder arrest rate of a neighboring county from their general perception of regional safety. Ownership decisions respond to perceived local threat — shaped by personal experience, local news, and social networks — not by cardinal knowledge of neighboring county administrative crime statistics. Even if a resident did observe $WAR_{it}$ with sufficient precision to act on it, the pathway from that observation to a gun death in county $i$ that does not pass through ownership is not apparent.
+
+Four robustness checks address these independence concerns empirically, with results reported in Table~\ref{tab:robustness}. The reduced-form specification regresses the firearm death rate directly on $WAR_{it}$ and all controls, bypassing the first stage entirely. The reduced-form coefficient on $WAR_{it}$ is positive and statistically significant ($\hat{\gamma}_1 = 0.123$, $p = 0.003$, clustered at the state level), confirming that the instrument operates on the outcome in the expected direction through a channel consistent with the ownership pathway. The ratio of the reduced-form to first-stage coefficients recovers the IV estimate to within three percent, consistent with the finite-sample relationship between the ratio estimator and two-stage least squares.
+
+The second check restricts the instrument to within-state neighbors only, excluding cross-state neighbor counties from the construction of $WAR_{it}$. Cross-state neighbors are more likely to share regional economic conditions through different policy environments and labor market linkages, making them the most plausible conduit for spatial autocorrelation bias. Restricting to within-state neighbors removes this source of potential contamination while retaining the leave-one-out structure. The within-state instrument produces a first-stage F-statistic of 16.81, comparable to the main specification, and a point estimate on HFR of 0.00434 — an attenuation of approximately 34 percent relative to the main specification coefficient of 0.00653. Under state-clustered standard errors the within-state estimate is not statistically significant at conventional levels, though the sign is preserved and the Wu-Hausman test continues to reject exogeneity of HFR ($p < 0.001$).
+
+The third check excludes all counties with at least one cross-state neighbor from the estimation sample entirely, retaining only interior counties where the spatial autocorrelation concern is most attenuated by geography. This restriction reduces the estimation sample from 19,922 to 13,224 county-year observations. The point estimate on HFR attenuates further to 0.00288 — a reduction of approximately 56 percent relative to the main specification — and is again insignificant under state-clustered standard errors, with a Wu-Hausman p-value of 0.002 confirming continued endogeneity of HFR.
+
+The attenuation pattern across the three specifications is consistent and monotone: as sources of cross-state spatial correlation are progressively removed, the point estimate declines. This pattern indicates that the spatial autocorrelation concern has empirical bite and is not merely theoretical. However, the sign of the HFR coefficient is positive and stable across all three specifications, and the Wu-Hausman test rejects exogeneity in every case, supporting the directional conclusion that firearm ownership exerts a positive causal effect on firearm mortality. The Anderson-Rubin test provides weak-instrument-robust inference and rejects the null hypothesis of no treatment effect ($F = 9.07$, $p = 0.003$). The corresponding 95 percent confidence interval, converted from the per capita units of the estimation to deaths per 100,000 per percentage point increase in HFR, is $[1.80, 52.90]$. The breadth of this interval reflects both the limited within-state time variation in HFR available for identification and the sample composition consequences of CDC suppression — a limitation examined in detail in Section~\ref{sec:Supp}. The Fuller bias-corrected estimator, which partially adjusts for weak instrument bias, produces a coefficient of 0.00615, approximately six percent below the TSLS estimate, suggesting that weak instrument bias is not the primary driver of the main result.
+
+A fourth robustness check addresses instrument validity more directly by augmenting the instrument set with the one-year lag of the neighboring county murder arrest rate, $WAR_{i,t-1}$. This overidentified specification is estimated over the 2000--2016 period (17,568 county-year observations) due to the absence of 1998 arrest data from the original sample, which precludes construction of $WAR_{i,t-1}$ for the 1999 observation year. The overidentified specification yields an HFR coefficient of 0.00636 (clustered SE = 0.003, $p < 0.1$), nearly identical to the preferred specification. The Hansen overidentification test produces a Sargan statistic of 2.409 ($p = 0.121$), failing to reject the null hypothesis of instrument validity. This result is consistent with both $WAR_{it}$ and $WAR_{i,t-1}$ identifying the same causal effect through the ownership channel, and is difficult to reconcile with a pure spatial autocorrelation story — if the instrument were primarily capturing a regional crime trend correlated with mortality through a channel independent of ownership, the two instruments would be expected to produce inconsistent estimates and the Sargan test would reject. The two instruments are not near-duplicates: after absorbing state and year fixed effects the residual correlation between $WAR_{it}$ and $WAR_{i,t-1}$ is 0.38, leaving each with substantial independent variation and the test with power to detect a violation specific to either. The joint Olea-Pflueger effective F on the two instruments is 2.89 under state-clustered standard errors; accordingly, inference for this specification rests on the consistency of the two point estimates and the Sargan result rather than on first-stage strength. These results are summarized in Table~\ref{tab:robustness}.
+
+% Figures referenced in identification section:
+
+\begin{table}[!htbp]
+\centering
+\caption{Robustness Checks: IV Estimates of the Effect of Household 
+Firearm Ownership on Firearm Mortality}
+\label{tab:robustness}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lccccc}
+\toprule
+ & Reduced Form & Main Specification & Within-State Instrument & Interior Counties & Overidentified \\
+ & (1) & (2) & (3) & (4) & (5) \\
+\midrule
+$WAR_{it}$ & 0.123$^{***}$ &              &           &           &           \\
+    & (0.041)              &              &           &           &           \\[0.5em]
+HFR &                      & 0.007$^{*}$  & 0.004     & 0.003     & 0.006$^{*}$ \\
+    &                      & (0.004)      & (0.003)   & (0.002)   & (0.003)   \\[0.5em]
+$\mathbbm{1}\{universal\}$ & $-$0.00000 & 0.0001     & 0.00004   & 0.00004   & 0.00001   \\
+    & (0.00000)            & (0.0001)     & (0.00004) & (0.00004) & (0.00002) \\[0.5em]
+$\mathbbm{1}\{permit\}$ & $-$0.00002$^{***}$ & 0.0002 & 0.0002    & 0.0001    & 0.0002$^{*}$ \\
+    & (0.00000)            & (0.0002)     & (0.0001)  & (0.0001)  & (0.0001)  \\
+\midrule
+Estimator          & OLS      & 2SLS         & 2SLS            & 2SLS       & 2SLS \\
+State FE           & Yes      & Yes          & Yes             & Yes        & Yes \\
+Year FE            & Yes      & Yes          & Yes             & Yes        & Yes \\
+SE Clustering      & State    & State        & State           & State      & State \\
+Instrument         & ---      & $WAR_{it}$   & $WAR^{in}_{it}$ & $WAR_{it}$ & $WAR_{it} + WAR_{i,t-1}$ \\
+Sample             & Full     & Full         & Full            & Interior   & Full \\
+First-Stage F      & ---      & 16.08        & 16.81           & 16.29      & 7.76 \\
+Effective F        & ---      & 5.14         & ---             & ---        & 2.89 \\
+Wu-Hausman $p$     & ---      & $<$0.001     & $<$0.001        & 0.002      & $<$0.001 \\
+Sargan $p$         & ---      & Exactly ID   & Exactly ID      & Exactly ID & 0.121 \\
+Observations       & 19,922   & 19,922       & 19,883          & 13,224     & 17,568 \\
+\bottomrule
+\end{tabular}
+}
+\begin{minipage}{\textwidth}
+\footnotesize
+\vspace{4pt}
+\textit{Notes:} Column (1) reports the reduced-form specification, which
+regresses the firearm death rate directly on $WAR_{it}$ and all controls,
+bypassing the first stage. Columns (2)--(5) report IV specifications
+instrumenting $HFR_{s,t}$ with the leave-one-out population-weighted mean
+murder arrest rate of neighboring counties ($WAR_{it}$). All specifications
+include state and year fixed effects. Column (2) reproduces the preferred
+two-way fixed effects specification. Column (3) restricts the instrument to
+within-state neighbors only, excluding cross-state neighbor counties from the
+construction of $WAR_{it}$. Column (4) excludes all counties with at least one
+cross-state neighbor from the estimation sample. Column (5) augments the
+instrument set with the one-year lag $WAR_{i,t-1}$, reducing the sample to
+2000--2016; the Sargan $p$-value is from the Hansen overidentification test and
+failure to reject ($p = 0.121$) is consistent with both instruments identifying
+the same causal effect through the ownership channel. The conventional
+first-stage F is reported without clustering; the Olea-Pflueger effective F
+accounts for the clustering structure and is reported where applicable.
+Standard errors clustered at the state level in parentheses.
+$^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{minipage}
+\end{table}
+
+% -----------------------------------------------------------------------------
+\section{Results}
+\label{sec:results}
+% -----------------------------------------------------------------------------
+
+Table \ref{tab:main_results} presents IV estimates of the effect of household firearm ownership on firearm mortality across three specifications. Column (1) is a pooled IV specification with no fixed effects. Column (2) adds state and year fixed effects and represents the preferred specification. Column (3) replaces year fixed effects with the post-2010 indicator $\mathbbm{1}\{decision_{i,t}\}$. The estimating sample consists of 19,922 county-year observations drawn from the 1999--2016 period, the latter bound determined by the availability of RAND household firearm ownership estimates. As established in the identification section, the first-stage coefficient on $WAR_{i,t}$ is positive and statistically significant ($\hat{\varphi}_{1} = 0.000182$; $se = 0.0000880$), and the Anderson-Rubin test confirms instrument validity under weak-instrument-robust inference ($F = 9.07$, $p = 0.003$). Turning to the second stage, the preferred specification in Column (2) indicates that a one percentage point increase in the household firearm ownership rate causally increases the firearm death rate by approximately 0.00653 deaths per capita --- equivalent to approximately 6.53 additional firearm deaths per 100,000 population per percentage point increase in HFR --- after absorbing state and year fixed effects. Relative to the estimation sample mean of 7.64 firearm deaths per 100,000, this corresponds to an increase of approximately 85\%; however, as documented in Section~\ref{sec:Supp}, the sample mean of 7.64 understates the true national unsuppressed mean of 11.77 per 100,000, and the point estimate should be interpreted in light of the suppression-driven sample composition discussed therein. The post-2010 indicator $\mathbbm{1}\{decision_{i,t}\}$ is positive and statistically significant in Column (3), consistent with the structural break in firearm mortality identified in the descriptive analysis. The policy indicators $\mathbbm{1}\{universal_{s,t}\}$ and $\mathbbm{1}\{permit_{s,t}\}$ are statistically insignificant across all three main specifications once standard errors are clustered at the state level, consistent with the limited within-state variation in these indicators over the 1999--2016 period documented in the data section.
+
+The timing of this structural break coincides with the Supreme Court's ruling in \textit{McDonald v. City of Chicago} (2010),\footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).} which extended the individual right to firearm possession established in \textit{District of Columbia v. Heller} (2008)\footnote{\textit{District of Columbia v. Heller}, 554 U.S. 570 (2008).} to the states, with the national firearm death rate remaining relatively stable through 2010 before rising steadily through the end of the sample period. However, as discussed in the conclusions, the precise mechanism driving the post-2010 trend is not fully resolved by the present analysis, and $\mathbbm{1}\{decision_{i,t}\}$ should be interpreted as capturing a broad structural shift in firearm mortality rather than the causal effect of a single legal ruling.
+%The positive and statistically significant coefficient on $\mathbbm{1}\{decision_{i,t}\}$ in Column (3) is consistent with the structural break in firearm mortality identified in the descriptive analysis, in which the national firearm death rate remained relatively stable through 2010 before rising steadily through the end of the sample period. The timing of this break coincides with the Supreme Court's ruling in \textit{McDonald v. City of Chicago} (2010),\footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).} which extended the individual right to firearm possession established in \textit{District of Columbia v. Heller} (2008)\footnote{\textit{District of Columbia v. Heller}, 554 U.S. 570 (2008).} to the states. However, as discussed in the conclusions, the precise mechanism driving the post-2010 trend is not fully resolved by the present analysis, and $\mathbbm{1}\{decision_{i,t}\}$ should be interpreted as capturing a broad structural shift in firearm mortality rather than the causal effect of a single legal ruling.
+
+% Main results table placeholder:
+\input{Guns_Main_Results}  
+% OR paste table directly here
+
+
+
+% -----------------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+% -----------------------------------------------------------------------------
+
+%This study examines the causal relationship between household firearm ownership rates and total firearm mortality using a county-level panel dataset spanning 1999--2016. Employing a leave-one-out instrumental variable strategy — the population-weighted mean murder arrest rate of neighboring counties — and instrumenting for state-level household firearm ownership rates, the preferred two-way fixed effects specification indicates that a one percentage point increase in the household firearm ownership rate causally increases the firearm death rate by approximately 0.00653 deaths per capita, equivalent to approximately 6.53 additional firearm deaths per 100,000 population per percentage point increase in HFR.
+
+This study examines the causal relationship between household firearm ownership rates and total firearm mortality using a county-level panel dataset spanning 1999--2016. The preferred two-way fixed effects specification, which instruments state-level household firearm ownership rates with the population-weighted leave-one-out mean murder arrest rate of neighboring counties, indicates that a one percentage point increase in the household firearm ownership rate causally increases the firearm death rate by approximately 0.00653 deaths per capita, equivalent to approximately 6.53 additional firearm deaths per 100,000 population per percentage point increase in HFR. Inference does not rest on first-stage strength: the Anderson-Rubin test, which is valid regardless of instrument strength, rejects the null hypothesis of no treatment effect ($F = 9.07$, $p = 0.003$) with a 95\% confidence interval of $[1.80, 52.90]$ additional deaths per 100,000 per percentage point increase in HFR, converted from the per capita units of the estimation. Four robustness checks — a reduced-form specification, restriction of the instrument to within-state neighbors, exclusion of border counties, and an overidentified specification augmenting the instrument with its one-year lag — confirm the directional finding. The within-state and interior county checks reveal systematic attenuation of the point estimate as sources of cross-state spatial variation are removed, with the HFR coefficient declining from 0.00653 to 0.00434 under the within-state instrument and further to 0.00288 under the interior county restriction. This attenuation is partly attributable to the suppression-driven composition of the estimation sample, which overrepresents large urban counties where the instrument has the most power. The true national unsuppressed mean firearm death rate of 11.77 per 100,000 substantially exceeds the estimation sample mean of 7.64 per 100,000, reflecting the systematic exclusion of small rural counties with high ownership rates and meaningful per capita mortality. A complete sample including currently suppressed rural counties would likely produce both a more precise point estimate and more stable robustness checks. The overidentified specification yields a point estimate of 0.00636, nearly identical to the preferred specification, and the Hansen overidentification test fails to reject instrument validity ($p = 0.121$), consistent with both instruments identifying the same causal effect through the ownership channel.
+
+The evidence on universal background check and concealed carry permit requirements is less conclusive. These indicators are statistically insignificant in the main specifications once standard errors are clustered at the state level, consistent with the limited within-state policy variation over the 1999--2016 period. The exceptions appear in the robustness checks, where $\mathbbm{1}\{permit_{s,t}\}$ is significant in the reduced form and marginally so in the overidentified specification; both are estimated on a different basis than the preferred specification and neither overturns the main conclusion. This finding adds to the already contested empirical literature on the effectiveness of these two policy instruments \citep{kovandzic2013estimating, siegel2013relationship}. The present results neither confirm nor rule out meaningful effects of these policies — rather, they suggest that the identifying variation available in this sample is insufficient to precisely estimate their causal effects, and that panel designs with richer within-state policy variation would be better suited to that question.
+
+The post-2010 structural break in firearm mortality, captured by $\mathbbm{1}\{decision_{i,t}\}$, is statistically significant and consistent with the expansion of individual firearm rights to the states following \textit{McDonald v. City of Chicago}.\footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).} However, a closer examination of the descriptive evidence complicates a straightforward \textit{Heller} and \textit{McDonald} interpretation. Firearm suicides among individuals assigned male at birth began rising as early as 2006, four years before \textit{McDonald} and two years before \textit{Heller}, while all other firearm deaths were declining over the same period, with the net effect on the overall firearm death rate not materializing until 2010. The causal effect of firearm ownership on total mortality established by the IV estimates is therefore distinct from the question of what drove the post-2010 structural break — the former is identified through within-county variation in ownership rates instrumented by neighboring arrest rates, while the latter reflects aggregate time-series dynamics that the present specification captures but does not fully decompose.
+
+The year 2006 predates the founding of Instagram and precedes Facebook's emergence as the dominant social media platform, which occurred around 2008. The bulk of veterans from the Second Iraq War began returning in 2007, the same year the Great Recession commenced. Each of these developments has been independently linked to elevated suicide risk in the existing literature, and their confluence around 2006--2008 warrants further investigation as a potential explanation for the observed increase in male firearm suicides. Disentangling the relative contributions of expanded firearm access, social media exposure, veteran reintegration, and economic distress to the post-2006 rise in male firearm suicide represents a promising direction for future research.
+
+% =============================================================================
+\appendix
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\section{Supplementary Material}
+\label{sec:appendix}
+% =============================================================================
+
+\subsection{Units of the estimated effect}
+\label{sec:units}
+
+The coefficient $\beta_{1}$ in the baseline specification is the change in 
+$d\_rate_{i,t}$, firearm deaths per capita, associated with a one-unit change 
+in $HFR_{s,t}$. Because $HFR_{s,t}$ is a proportion rather than a percentage, 
+a one-unit change is a move from no ownership to universal ownership, and the 
+estimated $\beta_{1} = 0.00653$ is the effect of that entire range.
+
+Converting to the units used in the text takes two steps. Deaths per capita 
+become deaths per 100,000 population by multiplying by $100{,}000$. A one-unit 
+change in $HFR_{s,t}$ becomes a one-percentage-point change by multiplying by 
+$0.01$. Together,
+\begin{align*}
+    0.00653 \times 100{,}000 \times 0.01 = 6.53
+\end{align*}
+additional firearm deaths per 100,000 population per percentage point increase 
+in the household firearm ownership rate.
+
+The net factor is therefore $1{,}000$ rather than $100{,}000$. Multiplying the 
+per capita coefficient by $100{,}000$ alone gives 653, which is a well-defined 
+quantity --- the effect per 100,000 population of moving a state from no 
+ownership to universal ownership --- but it is not the effect of a 
+one-percentage-point change, and it is the conversion a reader is most likely 
+to attempt. The same factor of $1{,}000$ converts the Anderson-Rubin 
+confidence interval reported on the coefficient scale into the interval given 
+in the text.
+
+\subsection{A bound on the urban ownership rate}
+\label{sec:hfr-bound}
+
+Consider North Carolina as an illustrative case. Over the period 1999--2016, the mean household firearm ownership rate (HFR) is 37\%. Let $r$ denote the rural ownership rate, $\mu$ the urban ownership rate, and $\alpha = 0.32$ the rural population share. The state mean satisfies
+\begin{align*}
+    0.37 &= \alpha r + (1-\alpha)\mu
+\end{align*}
+Even under an extreme upper bound in which $r=1$, the implied urban ownership rate is 
+$\mu=0.0641$. This bound illustrates that the state-level mean places substantial weight on the urban ownership rate.
+
+\subsection{Supplementary tables and figures}
+\label{sec:supp-floats}
 
 \begin{table}[!htbp]
 \centering
@@ -410,140 +582,32 @@ ownership rate over the estimation period per RAND Corporation estimates.
 \end{minipage}
 \end{table}
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{percent_covered.pdf}
+    \caption{Due to suppression in the CDC WONDER data, the share of the 
+    U.S. population represented in the estimating sample varies by year. 
+    The reported values represent upper bounds on annual population 
+    coverage. The upward trend is consistent with increasing population 
+    concentration in urban counties over time.}
+    \label{fig:pop_cov}
+\end{figure}
 
-
-% -----------------------------------------------------------------------------
-\section{Identification}
-\label{sec:id}
-% -----------------------------------------------------------------------------
-
-Empirical analyses typically begin with a formal specification of the econometric model. However, because the baseline specification is straightforward, the discussion begins with the identification strategy and the construction of the instrumental variable. The need for an instrumental variable arises from concerns about reverse causality. For example, if firearm violence increases in a neighborhood, residents may respond by purchasing firearms for protection, generating endogeneity in observed ownership rates. An ideal instrument would affect household firearm ownership while having no direct effect on firearm mortality. In studies focused narrowly on gun crime, researchers often use firearm suicide rates as an instrument for firearm ownership. However, because the present analysis examines total firearm mortality, including suicides, this approach would violate the exclusion restriction and reintroduce endogeneity concerns. A substantial literature documents a correlation between firearm ownership rates and crime rates \citep{cook2006social, cook1979effect, duggan2001more, hemenway2000firearm, kaplan1998firearm, miller2002rates, miller2007state, sorenson2001handgun, koenig2016dynamics}. \citet{depew2019decision} provide causal evidence that local homicide rates influence individual decisions to apply for concealed carry permits, establishing a link between neighborhood crime and firearm-related behavior. Building on this relationship, \citet{johnson2023armed} construct a leave-one-out instrument using neighboring county murder rates to identify the effect of concealed carry permit rates on firearm-related injuries. The present study adopts a similar strategy but uses murder arrest rates rather than murder rates, as arrest data are available at the county level through the UCR system, and instruments for household firearm ownership rates rather than concealed carry permit rates, thereby broadening both the outcome of interest and the geographic scope of identification.
-
-A natural concern is that the proposed instrument may violate the exclusion restriction. For example, an individual residing in a suburban county may commit a homicide in a neighboring urban county but be arrested in their county of residence. While such cross-county incidents may occur, several conditions must hold for this mechanism to generate systematic bias. First, the offender must reside in a county contiguous to the one in which the crime occurred. Second, such cross-county arrest patterns would need to be sufficiently prevalent and geographically systematic to bias the instrument. Empirical evidence suggests that most arrests occur within the offender's county of residence, indicating that criminal activity and arrest outcomes are predominantly local phenomena \citep{johnson2023armed}.
-
-The exclusion restriction could also fail if criminal activity systematically occurs across county borders, such that offenses are committed in one county but arrests consistently occur in another. However, available evidence suggests that most violent crime is geographically localized rather than systematically cross-jurisdictional. While organized criminal networks may operate across jurisdictions, such activity would need to be sufficiently widespread and systematically aligned with county borders to generate meaningful bias in the instrument. Empirical evidence indicates that arrests overwhelmingly occur within the county in which the offense was committed, limiting the scope for systematic cross-county misalignment \citep{johnson2023armed}. Accordingly, the instrument is constructed as the population-weighted leave-one-out mean murder arrest rate among counties neighboring county $i$, as defined formally below.
-    \begin{align}
-        WAR_{it}=\sum_{j\neq i}^{n}p_{jt}ar_{jt}
-    \end{align}
-
-\noindent where $ar_{jt}$ denotes the murder arrest rate in county $j$ at time $t$, and $p_{jt}$ denotes the population weight of county $j$ among all counties adjacent to $i$.
-
-%Returning to Figure \ref{fig:death_rate}, the time series warrants closer examination. Through 2010, the firearm death rate per 100,000 remained relatively stable at approximately 11. Beginning in 2010, the firearm death rate began a sustained upward trend that continued through 2020. After peaking in 2020, the firearm death rate declined, though not to pre-2010 levels.
-
-%\begin{quote}
-%    Private citizens have the right under the Second Amendment to possess an ordinary type of weapon and use it for lawful, historically established situations such as self-defense in a home, even when there is no relationship to a local militia.%
-%    \footnote{\textit{District of Columbia v. Heller}, 554 U.S. 570 (2008).}
-%\end{quote}
-%The decision recognized an individual right to possess firearms for self-defense, though its immediate application was limited to federal jurisdictions. It was not until 2010 that the Supreme Court found:
-%\begin{quote}
-%    The Due Process Clause of the Fourteenth Amendment extends the Second Amendment's right to keep and bear arms to the states, at least for traditional, lawful purposes such as self-defense.%
-%    \footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).}
-%\end{quote}
-%The Court's decision in McDonald incorporated the Second Amendment against the states, thereby invalidating certain state-level firearm restrictions. Figure \ref{fig:HFR} indicates increases in estimated household firearm ownership in 2011 and 2012, coinciding with the initial rise in firearm mortality shown in Figure \ref{fig:death_rate}. However, attributing these changes to the Court's decisions would require ruling out alternative explanations for contemporaneous increases in firearm ownership and mortality. Such a causal interpretation is further complicated by evidence that suicides account for the majority of the increase in firearm mortality during 2011--2012 (Figure \ref{fig:self_harm}). The period also coincides with broader social changes, including the rapid expansion of social media platforms. Prior research has linked increased social media use to elevated suicide risk, particularly among adolescent females \citep{jaycox2024social, massing2020cybervictimization}. Figure \ref{fig:sh_gender} shows a modest increase in firearm suicides among individuals assigned female at birth beginning around 2010. The corresponding increase among individuals assigned male at birth is substantially larger.
-
-In the panel setting, inference must account for serial correlation within states and common shocks over time. The choice of functional form also matters: a log specification is often convenient for rate outcomes, but it is undefined when the outcome is zero. In this application, some county-year observations record zero firearm deaths, implying a zero firearm death rate. These zeros reflect valid realizations of the outcome and should be retained in the estimating sample. Accordingly, the baseline specification is estimated in levels rather than log--log form.
-
-\begin{align}
-    d\_rate_{i,t} &= \beta_{1}HFR_{s,t} + \gamma_{s} + \delta_{t} +\mathbbm{1}\{universal_{s,t}\} + \mathbbm{1}\{permit_{s,t}\} +\epsilon_{i,t}
-\end{align}
-
-\noindent where $d\_rate_{i,t}$ denotes firearm deaths per capita in county $i$ at time $t$; $HFR_{s,t}$ denotes the state-level household firearm ownership rate; $s$ indexes states; and $t$ indexes years. $\mathbbm{1}\{universal_{s,t}\}$ and $\mathbbm{1}\{permit_{s,t}\}$ are indicator variables equal to one if state $s$ has universal background checks or permit requirements, respectively, in year $t$, and zero otherwise. Over the period 1999--2016 there is limited within-state variation in either indicator. During this period, states with universal background checks typically also required permits, and such policies were rarely repealed. Consequently, these indicators primarily capture cross-state differences rather than within-state policy changes. $\gamma_{s}$ and $\delta_{t}$ denote state and year fixed effects, respectively.
-
-\begin{align}
-    HFR_{s,t} = \varphi_{1}WAR_{i,t} + \gamma_{s} + \delta_{t} 
-    + \mathbbm{1}\{universal_{s,t}\} 
-    + \mathbbm{1}\{permit_{s,t}\} 
-    + \nu_{i,t}
-\end{align}
-
-\noindent $WAR_{i,t}$ denotes the population-weighted mean murder arrest rate among counties contiguous to county $i$, excluding county $i$ itself — the leave-one-out instrument. In the first-stage regression, the coefficient on $WAR_{i,t}$ is positive and statistically significant at the 5\% level with state-clustered standard errors ($\hat{\varphi}_{1} = 0.000182$; $se = 0.0000880$), consistent with the instrument shifting household firearm ownership rates in the expected direction. The first-stage F-statistic on the excluded instrument is 16.18 ($p < 0.001$) without clustering, exceeding the conventional threshold of 10 \citep{stock2002testing}. When standard errors are clustered at the state level, the Olea-Pflueger effective F-statistic \citep{olea2013robust} falls to 5.14, below the conventional threshold of 10 and raising concerns about instrument strength under clustered inference. To address this, the Anderson-Rubin test \citep{anderson1949estimation} -- which provides valid inference regardless of instrument strength -- is employed as the primary basis for inference. The Anderson-Rubin test rejects the null hypothesis of no treatment effect ($F = 56.68$, $p < 0.001$), with a weak-instrument-robust 95\% confidence interval of $[3.98, 13.09]$ additional deaths per 100,000 per percentage point increase in HFR, converted from the per capita units of the estimation, consistent with the 2SLS point estimate and supporting a positive causal effect of household firearm ownership on firearm mortality. Subsequent specifications include an additional indicator variable $\mathbbm{1}\{decision_{i,t}\}$, equal to one for observations after 2010 (and after 2008 for Washington, D.C.), to capture the structural break in firearm mortality coinciding with the \textit{McDonald v. City of Chicago} decision.\footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).} In these specifications, $\mathbbm{1}\{decision_{i,t}\}$ replaces the year fixed effects while state fixed effects are retained.
-
-Identifying a valid instrument for household firearm ownership is inherently difficult: any variable strongly correlated with ownership rates is likely also correlated with the structural disturbance $\epsilon_{i,t}$, violating the exclusion restriction. Hunting-related variables have appeared in prior work as proxies or instruments for firearm prevalence — including outdoor sports magazine subscriptions \citep{kovandzic2013estimating} and hunting license rates \citep{siegel2013relationship} — reflecting the strong correlation between hunting participation and household firearm ownership. These variables face two distinct objections. First, they may fail on relevance grounds: a safety-motivated purchaser is unlikely to hold a hunting license, meaning hunting-related measures do not capture the full range of ownership motivations relevant to the present context. Second, and more fundamentally, hunting participation is itself embedded in the broader cultural determinants of firearm prevalence and, potentially, firearm mortality — suggesting that hunting licenses may fail the exclusion restriction through channels independent of ownership rates.
-
-%Identifying a valid instrument for household firearm ownership is inherently difficult: any variable strongly correlated with ownership rates is likely also correlated with the structural disturbance $\epsilon_{i,t}$, violating the exclusion restriction. Hunting-related variables have appeared in prior work as proxies or instruments for firearm prevalence — including outdoor sports magazine subscriptions \citep{kovandzic2013estimating} and hunting license rates \citep{siegel2013relationship} — reflecting the strong correlation between hunting participation and household firearm ownership. For example, a safety-motivated purchaser is unlikely to hold a hunting license, illustrating that hunting-related variables may not capture the full range of ownership motivations relevant to the present context. More fundamentally, hunting participation is itself embedded in the broader cultural determinants of firearm prevalence and, potentially, firearm mortality — suggesting that hunting licenses may fail the exclusion restriction through channels independent of ownership rates.
-
-An alternative instrument employed in prior work is the homicide rate in neighboring counties \citep{johnson2023armed}. This approach performs reasonably well in urban areas but faces limitations in rural counties, where homicide counts are low and CDC suppression is prevalent, reducing the precision and coverage of the instrument. The leave-one-out murder arrest rate instrument faces the same limitation in rural counties; however, because CDC suppression disproportionately excludes rural county-year observations from the estimating sample, the practical impact of this constraint on first-stage precision is attenuated within the observed sample — though as documented in Section~\ref{sec:Supp}, the suppression that limits this concern simultaneously introduces sample composition bias that affects the interpretation of the estimates. Neighboring county suicide rates are similarly unsuitable as an instrument, as they would violate the exclusion restriction through the firearm substitution effect. Firearm ownership increases the likelihood of firearm suicide among suicidal individuals \citep{briggs2014firearms}, and recent evidence suggests ownership causally precedes increases in firearm suicide rates \citep{morral2024household} — meaning that any instrument correlated with suicide rates would also be correlated with the outcome through this channel. The number of taxidermists per capita has also been proposed as an instrument for firearm ownership, given that hunters frequently use taxidermy services — establishing a link between taxidermist prevalence and hunting activity, and by extension, firearm ownership.
-
-Although taxidermists represent an ancillary component of hunting culture, the channel through which taxidermist prevalence would affect firearm mortality, independent of ownership rates, is not apparent, suggesting the instrument may satisfy the exclusion restriction but raise concerns about relevance. A practical obstacle is that the North American Industry Classification System (NAICS) does not provide a dedicated code for taxidermists, instead classifying them under the broader category of independent artists, which encompasses actors, writers, and directors — making it difficult to isolate taxidermist counts from aggregate data. Whether this data limitation could be resolved through alternative sources, such as state-level business licensing records, remains an avenue for future research. Despite the instrument strength concerns discussed above, the leave-one-out neighboring county murder arrest rate remains attractive relative to available alternatives: it is derived from administrative data sources, its exclusion restriction is more plausibly defensible than hunting-related or suicide-based instruments, and the Anderson-Rubin test provides weak-instrument-robust evidence of a significant treatment effect.
-
-%--------------------------------------------------------------------------------------------------
-\subsection{Instrument Validity and Robustness}
-\label{sec:IV-R}
-%--------------------------------------------------------------------------------------------------
-
-The most serious threat to the exclusion restriction is spatial autocorrelation in crime. If regional economic conditions, demographic shifts, or unobserved cultural factors generate correlated crime trends across neighboring counties, the neighboring murder arrest rate may be correlated with unobserved local shocks in county $i$ that independently affect both firearm ownership and firearm mortality. This concern cannot be fully dismissed. Crime is not typically randomly distributed across space, and counties that border high-arrest counties may share labor markets, demographic characteristics, or social conditions that are themselves determinants of firearm mortality. Two features of the design partially address this concern. State fixed effects absorb persistent cross-county differences in crime culture, legal environment, and demographic composition that operate at the state level. Year fixed effects absorb common national shocks to crime and mortality that affect all counties simultaneously. The residual threat is time-varying, within-state spatial correlation in crime trends not captured by either set of fixed effects — a narrower concern than the raw spatial autocorrelation problem, though not a trivial one.
-
-A second potential violation of the exclusion restriction arises if residents of county $i$ directly observe $WAR_{it}$ and update their firearm ownership decisions through a channel that also affects mortality independent of ownership. This mechanism requires that individuals possess sufficiently precise knowledge of neighboring county murder arrest rates to incorporate them into ownership decisions. This condition is implausible in practice. Murder arrest rates are bureaucratic aggregates compiled from administrative records and reported, if at all, in statistical publications with limited public salience. Even residents with above-average awareness of local crime conditions are unlikely to distinguish the murder arrest rate of a neighboring county from their general perception of regional safety. Ownership decisions respond to perceived local threat — shaped by personal experience, local news, and social networks — not by cardinal knowledge of neighboring county administrative crime statistics. Even if a resident did observe $WAR_{it}$ with sufficient precision to act on it, the pathway from that observation to a gun death in county $i$ that does not pass through ownership is not apparent.
-
-Four robustness checks address these independence concerns empirically, with results reported in Table~\ref{tab:robustness}. The reduced-form specification regresses the firearm death rate directly on $WAR_{it}$ and all controls, bypassing the first stage entirely. The reduced-form coefficient on $WAR_{it}$ is positive and statistically significant ($\hat{\gamma}_1 = 0.123$, $p = 0.003$, clustered at the state level), confirming that the instrument operates on the outcome in the expected direction through a channel consistent with the ownership pathway. The ratio of the reduced-form to first-stage coefficients recovers the IV estimate to within three percent, consistent with the finite-sample relationship between the ratio estimator and two-stage least squares.
-
-The second check restricts the instrument to within-state neighbors only, excluding cross-state neighbor counties from the construction of $WAR_{it}$. Cross-state neighbors are more likely to share regional economic conditions through different policy environments and labor market linkages, making them the most plausible conduit for spatial autocorrelation bias. Restricting to within-state neighbors removes this source of potential contamination while retaining the leave-one-out structure. The within-state instrument produces a first-stage F-statistic of 16.81, comparable to the main specification, and a point estimate on HFR of 0.00434 — an attenuation of approximately 34 percent relative to the main specification coefficient of 0.00653. Under state-clustered standard errors the within-state estimate is not statistically significant at conventional levels, though the sign is preserved and the Wu-Hausman test continues to reject exogeneity of HFR ($p < 0.001$).
-
-The third check excludes all counties with at least one cross-state neighbor from the estimation sample entirely, retaining only interior counties where the spatial autocorrelation concern is most attenuated by geography. This restriction reduces the estimation sample from 19,922 to 13,224 county-year observations. The point estimate on HFR attenuates further to 0.00288 — a reduction of approximately 56 percent relative to the main specification — and is again insignificant under state-clustered standard errors, with a Wu-Hausman p-value of 0.002 confirming continued endogeneity of HFR.
-
-The attenuation pattern across the three specifications is consistent and monotone: as sources of cross-state spatial correlation are progressively removed, the point estimate declines. This pattern indicates that the spatial autocorrelation concern has empirical bite and is not merely theoretical. However, the sign of the HFR coefficient is positive and stable across all three specifications, and the Wu-Hausman test rejects exogeneity in every case, supporting the directional conclusion that firearm ownership exerts a positive causal effect on firearm mortality. The Anderson-Rubin test provides weak-instrument-robust inference and rejects the null hypothesis of no treatment effect ($F = 56.68$, $p < 0.001$). The corresponding 95 percent confidence interval, converted from the per capita units of the estimation to deaths per 100,000 per percentage point increase in HFR, is $[3.98, 13.09]$. The breadth of this interval reflects both the limited within-state time variation in HFR available for identification and the sample composition consequences of CDC suppression — a limitation examined in detail in Section~\ref{sec:Supp}. The Fuller bias-corrected estimator, which partially adjusts for weak instrument bias, produces a coefficient of 0.00615, approximately six percent below the TSLS estimate, suggesting that weak instrument bias is not the primary driver of the main result.
-
-A fourth robustness check addresses instrument validity more directly by augmenting the instrument set with the one-year lag of the neighboring county murder arrest rate, $WAR_{i,t-1}$. This overidentified specification is estimated over the 2000--2016 period (17,568 county-year observations) due to the absence of 1998 arrest data from the original sample, which precludes construction of $WAR_{i,t-1}$ for the 1999 observation year. The overidentified specification yields an HFR coefficient of 0.00636 (clustered SE = 0.003, $p < 0.1$), nearly identical to the preferred specification. The Hansen overidentification test produces a Sargan statistic of 2.409 ($p = 0.121$), failing to reject the null hypothesis of instrument validity. This result is consistent with both $WAR_{it}$ and $WAR_{i,t-1}$ identifying the same causal effect through the ownership channel, and is difficult to reconcile with a pure spatial autocorrelation story — if the instrument were primarily capturing a regional crime trend correlated with mortality through a channel independent of ownership, the two instruments would be expected to produce inconsistent estimates and the Sargan test would reject. The two instruments are not near-duplicates: after absorbing state and year fixed effects the residual correlation between $WAR_{it}$ and $WAR_{i,t-1}$ is 0.38, leaving each with substantial independent variation and the test with power to detect a violation specific to either. The joint Olea-Pflueger effective F on the two instruments is 2.89 under state-clustered standard errors; accordingly, inference for this specification rests on the consistency of the two point estimates and the Sargan result rather than on first-stage strength. These results are summarized in Table~\ref{tab:robustness}.
-
-% Figures referenced in identification section:
-
-\begin{table}[!htbp]
-\centering
-\caption{Robustness Checks: IV Estimates of the Effect of Household 
-Firearm Ownership on Firearm Mortality}
-\label{tab:robustness}
-\resizebox{\textwidth}{!}{
-\begin{tabular}{lccccc}
-\toprule
- & Reduced Form & Main Specification & Within-State Instrument & Interior Counties & Overidentified \\
- & (1) & (2) & (3) & (4) & (5) \\
-\midrule
-$WAR_{it}$ & 0.123$^{***}$ &              &           &           &           \\
-    & (0.041)              &              &           &           &           \\[0.5em]
-HFR &                      & 0.007$^{*}$  & 0.004     & 0.003     & 0.006$^{*}$ \\
-    &                      & (0.004)      & (0.003)   & (0.002)   & (0.003)   \\[0.5em]
-$\mathbbm{1}\{universal\}$ & $-$0.00000 & 0.0001     & 0.00004   & 0.00004   & 0.00001   \\
-    & (0.00000)            & (0.0001)     & (0.00004) & (0.00004) & (0.00002) \\[0.5em]
-$\mathbbm{1}\{permit\}$ & $-$0.00002$^{***}$ & 0.0002 & 0.0002    & 0.0001    & 0.0002$^{*}$ \\
-    & (0.00000)            & (0.0002)     & (0.0001)  & (0.0001)  & (0.0001)  \\
-\midrule
-Estimator          & OLS      & 2SLS         & 2SLS            & 2SLS       & 2SLS \\
-State FE           & Yes      & Yes          & Yes             & Yes        & Yes \\
-Year FE            & Yes      & Yes          & Yes             & Yes        & Yes \\
-SE Clustering      & State    & State        & State           & State      & State \\
-Instrument         & ---      & $WAR_{it}$   & $WAR^{in}_{it}$ & $WAR_{it}$ & $WAR_{it} + WAR_{i,t-1}$ \\
-Sample             & Full     & Full         & Full            & Interior   & Full \\
-First-Stage F      & ---      & 16.08        & 16.81           & 16.29      & 7.76 \\
-Effective F        & ---      & 5.14         & ---             & ---        & 2.89 \\
-Wu-Hausman $p$     & ---      & $<$0.001     & $<$0.001        & 0.002      & $<$0.001 \\
-Sargan $p$         & ---      & Exactly ID   & Exactly ID      & Exactly ID & 0.121 \\
-Observations       & 19,922   & 19,922       & 19,883          & 13,224     & 17,568 \\
-\bottomrule
-\end{tabular}
-}
-\begin{minipage}{\textwidth}
-\footnotesize
-\vspace{4pt}
-\textit{Notes:} Column (1) reports the reduced-form specification, which
-regresses the firearm death rate directly on $WAR_{it}$ and all controls,
-bypassing the first stage. Columns (2)--(5) report IV specifications
-instrumenting $HFR_{s,t}$ with the leave-one-out population-weighted mean
-murder arrest rate of neighboring counties ($WAR_{it}$). All specifications
-include state and year fixed effects. Column (2) reproduces the preferred
-two-way fixed effects specification. Column (3) restricts the instrument to
-within-state neighbors only, excluding cross-state neighbor counties from the
-construction of $WAR_{it}$. Column (4) excludes all counties with at least one
-cross-state neighbor from the estimation sample. Column (5) augments the
-instrument set with the one-year lag $WAR_{i,t-1}$, reducing the sample to
-2000--2016; the Sargan $p$-value is from the Hansen overidentification test and
-failure to reject ($p = 0.121$) is consistent with both instruments identifying
-the same causal effect through the ownership channel. The conventional
-first-stage F is reported without clustering; the Olea-Pflueger effective F
-accounts for the clustering structure and is reported where applicable.
-Standard errors clustered at the state level in parentheses.
-$^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$.
-\end{minipage}
-\end{table}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{unsuppressed_county_year_observations.pdf}
+    \caption{Number of unsuppressed county-year observations by year, 
+    1999--2020. A county-year observation is unsuppressed when the recorded 
+    firearm death count exceeds nine, the CDC WONDER confidentiality 
+    threshold. The dashed vertical line marks the \textit{McDonald v.\ City 
+    of Chicago} decision (2010), after which the number of unsuppressed 
+    observations rises steadily, consistent with increasing firearm mortality 
+    pulling previously suppressed county-year cells above the suppression 
+    threshold. The dotted vertical line marks the end of the estimation 
+    period (2016), determined by the availability of RAND household firearm 
+    ownership estimates.}
+    \label{fig:unsuppressed}
+\end{figure}
 
 \begin{figure}[htbp]
     \centering
@@ -554,37 +618,6 @@ $^{*}p<0.1$, $^{**}p<0.05$, $^{***}p<0.01$.
     representing roughly 15\% of firearm suicides in those years.}
     \label{fig:sh_gender}
 \end{figure}
-
-% -----------------------------------------------------------------------------
-\section{Results}
-\label{sec:results}
-% -----------------------------------------------------------------------------
-
-Table \ref{tab:main_results} presents IV estimates of the effect of household firearm ownership on firearm mortality across three specifications. Column (1) is a pooled IV specification with no fixed effects. Column (2) adds state and year fixed effects and represents the preferred specification. Column (3) replaces year fixed effects with the post-2010 indicator $\mathbbm{1}\{decision_{i,t}\}$. The estimating sample consists of 19,922 county-year observations drawn from the 1999--2016 period, the latter bound determined by the availability of RAND household firearm ownership estimates. As established in the identification section, the first-stage coefficient on $WAR_{i,t}$ is positive and statistically significant ($\hat{\varphi}_{1} = 0.000182$; $se = 0.0000880$), and the Anderson-Rubin test confirms instrument validity under weak-instrument-robust inference ($F = 56.68$, $p < 0.001$). Turning to the second stage, the preferred specification in Column (2) indicates that a one percentage point increase in the household firearm ownership rate causally increases the firearm death rate by approximately 0.00653 deaths per capita --- equivalent to approximately 6.53 additional firearm deaths per 100,000 population per percentage point increase in HFR --- after absorbing state and year fixed effects. Relative to the estimation sample mean of 7.64 firearm deaths per 100,000, this corresponds to an increase of approximately 85\%; however, as documented in Section~\ref{sec:Supp}, the sample mean of 7.64 understates the true national unsuppressed mean of 11.77 per 100,000, and the point estimate should be interpreted in light of the suppression-driven sample composition discussed therein. The post-2010 indicator $\mathbbm{1}\{decision_{i,t}\}$ is positive and statistically significant in Column (3), consistent with the structural break in firearm mortality identified in the descriptive analysis. The policy indicators $\mathbbm{1}\{universal_{s,t}\}$ and $\mathbbm{1}\{permit_{s,t}\}$ are statistically insignificant across all three main specifications once standard errors are clustered at the state level, consistent with the limited within-state variation in these indicators over the 1999--2016 period documented in the data section.
-
-The timing of this structural break coincides with the Supreme Court's ruling in \textit{McDonald v. City of Chicago} (2010),\footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).} which extended the individual right to firearm possession established in \textit{District of Columbia v. Heller} (2008)\footnote{\textit{District of Columbia v. Heller}, 554 U.S. 570 (2008).} to the states, with the national firearm death rate remaining relatively stable through 2010 before rising steadily through the end of the sample period. However, as discussed in the conclusions, the precise mechanism driving the post-2010 trend is not fully resolved by the present analysis, and $\mathbbm{1}\{decision_{i,t}\}$ should be interpreted as capturing a broad structural shift in firearm mortality rather than the causal effect of a single legal ruling.
-%The positive and statistically significant coefficient on $\mathbbm{1}\{decision_{i,t}\}$ in Column (3) is consistent with the structural break in firearm mortality identified in the descriptive analysis, in which the national firearm death rate remained relatively stable through 2010 before rising steadily through the end of the sample period. The timing of this break coincides with the Supreme Court's ruling in \textit{McDonald v. City of Chicago} (2010),\footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).} which extended the individual right to firearm possession established in \textit{District of Columbia v. Heller} (2008)\footnote{\textit{District of Columbia v. Heller}, 554 U.S. 570 (2008).} to the states. However, as discussed in the conclusions, the precise mechanism driving the post-2010 trend is not fully resolved by the present analysis, and $\mathbbm{1}\{decision_{i,t}\}$ should be interpreted as capturing a broad structural shift in firearm mortality rather than the causal effect of a single legal ruling.
-
-% Main results table placeholder:
-\input{Guns_Main_Results}  
-% OR paste table directly here
-
-
-
-% -----------------------------------------------------------------------------
-\section{Conclusion}
-\label{sec:conclusion}
-% -----------------------------------------------------------------------------
-
-%This study examines the causal relationship between household firearm ownership rates and total firearm mortality using a county-level panel dataset spanning 1999--2016. Employing a leave-one-out instrumental variable strategy — the population-weighted mean murder arrest rate of neighboring counties — and instrumenting for state-level household firearm ownership rates, the preferred two-way fixed effects specification indicates that a one percentage point increase in the household firearm ownership rate causally increases the firearm death rate by approximately 0.00653 deaths per capita, equivalent to approximately 6.53 additional firearm deaths per 100,000 population per percentage point increase in HFR.
-
-This study examines the causal relationship between household firearm ownership rates and total firearm mortality using a county-level panel dataset spanning 1999--2016. The preferred two-way fixed effects specification, which instruments state-level household firearm ownership rates with the population-weighted leave-one-out mean murder arrest rate of neighboring counties, indicates that a one percentage point increase in the household firearm ownership rate causally increases the firearm death rate by approximately 0.00653 deaths per capita, equivalent to approximately 6.53 additional firearm deaths per 100,000 population per percentage point increase in HFR. Inference does not rest on first-stage strength: the Anderson-Rubin test, which is valid regardless of instrument strength, rejects the null hypothesis of no treatment effect ($F = 56.68$, $p < 0.001$) with a 95\% confidence interval of $[3.98, 13.09]$ additional deaths per 100,000 per percentage point increase in HFR, converted from the per capita units of the estimation. Four robustness checks — a reduced-form specification, restriction of the instrument to within-state neighbors, exclusion of border counties, and an overidentified specification augmenting the instrument with its one-year lag — confirm the directional finding. The within-state and interior county checks reveal systematic attenuation of the point estimate as sources of cross-state spatial variation are removed, with the HFR coefficient declining from 0.00653 to 0.00434 under the within-state instrument and further to 0.00288 under the interior county restriction. This attenuation is partly attributable to the suppression-driven composition of the estimation sample, which overrepresents large urban counties where the instrument has the most power. The true national unsuppressed mean firearm death rate of 11.77 per 100,000 substantially exceeds the estimation sample mean of 7.64 per 100,000, reflecting the systematic exclusion of small rural counties with high ownership rates and meaningful per capita mortality. A complete sample including currently suppressed rural counties would likely produce both a more precise point estimate and more stable robustness checks. The overidentified specification yields a point estimate of 0.00636, nearly identical to the preferred specification, and the Hansen overidentification test fails to reject instrument validity ($p = 0.121$), consistent with both instruments identifying the same causal effect through the ownership channel.
-
-The evidence on universal background check and concealed carry permit requirements is less conclusive. These indicators are statistically insignificant in the main specifications once standard errors are clustered at the state level, consistent with the limited within-state policy variation over the 1999--2016 period. The exceptions appear in the robustness checks, where $\mathbbm{1}\{permit_{s,t}\}$ is significant in the reduced form and marginally so in the overidentified specification; both are estimated on a different basis than the preferred specification and neither overturns the main conclusion. This finding adds to the already contested empirical literature on the effectiveness of these two policy instruments \citep{kovandzic2013estimating, siegel2013relationship}. The present results neither confirm nor rule out meaningful effects of these policies — rather, they suggest that the identifying variation available in this sample is insufficient to precisely estimate their causal effects, and that panel designs with richer within-state policy variation would be better suited to that question.
-
-The post-2010 structural break in firearm mortality, captured by $\mathbbm{1}\{decision_{i,t}\}$, is statistically significant and consistent with the expansion of individual firearm rights to the states following \textit{McDonald v. City of Chicago}.\footnote{\textit{McDonald v. City of Chicago}, 561 U.S. 742 (2010).} However, a closer examination of the descriptive evidence complicates a straightforward \textit{Heller} and \textit{McDonald} interpretation. Firearm suicides among individuals assigned male at birth began rising as early as 2006, four years before \textit{McDonald} and two years before \textit{Heller}, while all other firearm deaths were declining over the same period, with the net effect on the overall firearm death rate not materializing until 2010. The causal effect of firearm ownership on total mortality established by the IV estimates is therefore distinct from the question of what drove the post-2010 structural break — the former is identified through within-county variation in ownership rates instrumented by neighboring arrest rates, while the latter reflects aggregate time-series dynamics that the present specification captures but does not fully decompose.
-
-The year 2006 predates the founding of Instagram and precedes Facebook's emergence as the dominant social media platform, which occurred around 2008. The bulk of veterans from the Second Iraq War began returning in 2007, the same year the Great Recession commenced. Each of these developments has been independently linked to elevated suicide risk in the existing literature, and their confluence around 2006--2008 warrants further investigation as a potential explanation for the observed increase in male firearm suicides. Disentangling the relative contributions of expanded firearm access, social media exposure, veteran reintegration, and economic distress to the post-2006 rise in male firearm suicide represents a promising direction for future research.
 
 % =============================================================================
 % Back matter
